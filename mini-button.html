@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Link to the local Bootstrap CSS -->
+        <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+        <style>
+            body {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #2c3e50;
+                -webkit-app-region: drag;
+            }
+
+            #reopenButton {
+                border: none;
+                padding: 0;
+                margin: 0;
+                width: 40px;
+                height: 40px;
+                font-size: 2em;
+                color: #ffffff;
+                display: inline;
+                background-color: #f39c12;
+                -webkit-app-region: no-drag;
+            }
+
+            #reopenButton:hover {
+                background-color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <button class="btn btn-dark" id="reopenButton">+</button>
+        <script>
+            const { ipcRenderer } = require('electron');
+
+            // Button is clicked and main window is restored.
+            document.getElementById('reopenButton').addEventListener('click', () => {
+                ipcRenderer.send('restore-main-window');
+            });
+        </script>
+        <!-- Link to the local Bootstrap JS -->
+        <script src="./assets/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
