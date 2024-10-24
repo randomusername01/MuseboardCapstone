@@ -1,5 +1,5 @@
 const path = require('path');
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, screen } = require('electron');
 
 
 // Require electron module to reload when file changes saved.
@@ -32,12 +32,23 @@ ipcMain.on('minimize-to-button', (e) => {
     // Hide the main window.
     mainWindow.hide();
 
+    // Getting the display width and height.
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
+    // Defining the window size for mini window.
+    const windowWidth = 70;
+    const windowHeight = 70;
+
+    // Calculating the x and y positions to center window vertically and align to right side.
+    const xPos = width - windowWidth;
+    const yPos = (height - windowHeight) / 2;
+
     // Creating mini window for button.
     miniButtonWindow = new BrowserWindow({
       width: 70,
       height: 70,
-      x: 0,
-      y: 100,
+      x: xPos,
+      y: yPos,
       frame: false,
       transparent: true,
       alwaysOnTop: true,
