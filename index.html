@@ -3,11 +3,21 @@
   <head>
     <title>Museboard</title>
 
+    <link rel="stylesheet" href="./assets/css/sidebar.css">
     <!-- Link to the local Bootstrap CSS -->
     <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <!-- Link to the Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   </head>
   <body>
-    <button type="button" class="btn btn-secondary" id="minimizeButton">Minimize</button>
+    <div class="sidebar">
+      <button id="textButton" title="Add Text" aria-label="Add Text"><i class="fas fa-font"></i></button>
+      <button id="imageButton" title="Add Image" aria-label="Add Image"><i class="fas fa-image"></i></button>
+      <button id="gifButton" title="Add GIF" aria-label="Add GIF">GIF</button>
+      <button id="linkButton" title="Add HyperLink" aria-label="Add HyperLink"><i class="fas fa-link"></i></button>
+      <button id="backgroundButton" title="Change Background" aria-label="Change Background"><i class="fas fa-brush"></i></button>
+      <button id="minimizeButton" title="Minimize to Side" aria-label="Minimize to Side"><i class="fas fa-minus"></i></button>
+    </div>
 
     <script src="renderer.js"></script>
     <!-- Link to the local Bootstrap JS -->
