@@ -1,4 +1,3 @@
-/* style.css */
 body, html {
     margin: 0;
     padding: 0;
@@ -10,30 +9,30 @@ body, html {
 .panel {
     position: fixed;
     top: 0;
-    right: 0; /* Align to the right */
+    right: 0;
     width: calc(100% - 40px); /* Leave space for the button */
     height: 100%;
-    background: linear-gradient(135deg, #2c3e50, #34495e); /* Dark gradient background */
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     display: flex;
     align-items: start;
     flex-direction: column;
-    padding: 10px; /* Add padding */
+    padding: 10px;
     box-sizing: border-box;
     transition: transform 0.5s ease;
-    transform: translateX(100%); /* Initially hidden by sliding off-screen */
-    color: #ecf0f1; /* Light text color */
-    border-left: 2px solid #7f8c8d; /* Border to visually separate panel */
+    transform: translateX(100%);
+    color: #ecf0f1;
+    border-left: 2px solid #7f8c8d;
 }
 
 .panel.visible {
-    transform: translateX(0); /* Slide into view */
+    transform: translateX(0);
 }
 
 /* Toggle button styling */
 #toggleButton {
     position: absolute;
     top: 50%;
-    left: -40px; /* Position button just outside the panel on the left */
+    left: -40px;
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
@@ -57,13 +56,42 @@ body, html {
     height: 100%;
 }
 
-/* Panel Header */
+/* Compact Panel Header */
 .panel-header {
     text-align: center;
-    padding: 10px;
-    font-size: 1.2em;
+    padding: 2px 0; /* Minimal padding */
+    font-size: 0.9em; /* Smaller font size */
+    line-height: 1.2; /* Tighter line spacing */
     background-color: #34495e;
     border-bottom: 1px solid #7f8c8d;
+}
+
+/* Toolbar Section */
+.toolbar {
+    display: flex;
+    justify-content: space-around;
+    padding: 5px;
+    background-color: #34495e;
+}
+
+.toolbar-btn {
+    background: none;
+    border: none;
+    color: #ecf0f1;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.toolbar-btn:hover {
+    color: #bdc3c7;
+}
+
+/* Separator Line */
+.separator-line {
+    border: 0;
+    height: 1px;
+    background: #7f8c8d;
+    margin: 5px 0;
 }
 
 /* Writable Area */
@@ -77,7 +105,7 @@ body, html {
 
 .writable-area textarea {
     width: 100%;
-    height: 90%;
+    height: 100%;
     resize: none;
     padding: 10px;
     font-size: 1em;
