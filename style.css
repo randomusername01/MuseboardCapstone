@@ -1,0 +1,90 @@
+/* style.css */
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+}
+
+/* Panel styling */
+.panel {
+    position: fixed;
+    top: 0;
+    right: 0; /* Align to the right */
+    width: calc(100% - 40px); /* Leave space for the button */
+    height: 100%;
+    background: linear-gradient(135deg, #2c3e50, #34495e); /* Dark gradient background */
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+    padding: 10px; /* Add padding */
+    box-sizing: border-box;
+    transition: transform 0.5s ease;
+    transform: translateX(100%); /* Initially hidden by sliding off-screen */
+    color: #ecf0f1; /* Light text color */
+    border-left: 2px solid #7f8c8d; /* Border to visually separate panel */
+}
+
+.panel.visible {
+    transform: translateX(0); /* Slide into view */
+}
+
+/* Toggle button styling */
+#toggleButton {
+    position: absolute;
+    top: 50%;
+    left: -40px; /* Position button just outside the panel on the left */
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    font-size: 1.5em;
+    background-color: rgba(127, 140, 141, 0.8);
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    transition: opacity 0.5s ease;
+}
+
+#toggleButton:hover {
+    opacity: 1;
+}
+
+/* Panel Content */
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+/* Panel Header */
+.panel-header {
+    text-align: center;
+    padding: 10px;
+    font-size: 1.2em;
+    background-color: #34495e;
+    border-bottom: 1px solid #7f8c8d;
+}
+
+/* Writable Area */
+.writable-area {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.writable-area textarea {
+    width: 100%;
+    height: 90%;
+    resize: none;
+    padding: 10px;
+    font-size: 1em;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    border: none;
+    outline: none;
+    box-shadow: inset 0px 0px 5px rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
