@@ -5,12 +5,11 @@ body, html {
     background: transparent;
 }
 
-/* Panel styling */
 .panel {
     position: fixed;
     top: 0;
     right: 0;
-    width: calc(100% - 40px); /* Leave space for the button */
+    width: calc(100% - 40px); 
     height: 100%;
     background: linear-gradient(135deg, #2c3e50, #34495e);
     display: flex;
@@ -28,7 +27,6 @@ body, html {
     transform: translateX(0);
 }
 
-/* Toggle button styling */
 #toggleButton {
     position: absolute;
     top: 50%;
@@ -48,7 +46,6 @@ body, html {
     opacity: 1;
 }
 
-/* Panel Content */
 .panel-content {
     display: flex;
     flex-direction: column;
@@ -56,17 +53,15 @@ body, html {
     height: 100%;
 }
 
-/* Compact Panel Header */
 .panel-header {
     text-align: center;
-    padding: 2px 0; /* Minimal padding */
-    font-size: 0.9em; /* Smaller font size */
-    line-height: 1.2; /* Tighter line spacing */
+    padding: 2px 0; 
+    font-size: 0.9em; 
+    line-height: 1.2; 
     background-color: #34495e;
     border-bottom: 1px solid #7f8c8d;
 }
 
-/* Toolbar Section */
 .toolbar {
     display: flex;
     justify-content: space-around;
@@ -86,7 +81,6 @@ body, html {
     color: #bdc3c7;
 }
 
-/* Separator Line */
 .separator-line {
     border: 0;
     height: 1px;
@@ -94,7 +88,6 @@ body, html {
     margin: 5px 0;
 }
 
-/* Writable Area */
 .writable-area {
     flex: 1;
     padding: 10px;
@@ -110,7 +103,7 @@ body, html {
     padding: 10px;
     font-size: 1em;
     background-color: #ecf0f1;
-    color: #2c3e50;
+    color: #000000;
     border: none;
     outline: none;
     box-shadow: inset 0px 0px 5px rgba(0,0,0,0.1);

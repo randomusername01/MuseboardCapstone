@@ -5,12 +5,12 @@ let mainWindow;
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const panelWidth = Math.floor(width / 3) - 40; // One-third of the screen minus space for the button
+  const panelWidth = Math.floor(width / 3) - 40; 
 
   mainWindow = new BrowserWindow({
-    width: 60, // Start with just the button visible
+    width: 60, 
     height,
-    x: width - 60, // Position button on the far right edge
+    x: width - 60, 
     y: 0,
     frame: false,
     transparent: true,
@@ -24,12 +24,12 @@ function createWindow() {
 
   mainWindow.loadFile('index.html');
 
-  // Adjust window bounds based on panel visibility
+  
   ipcMain.on('toggle-panel', (event, isVisible) => {
     if (isVisible) {
-      mainWindow.setBounds({ x: width - panelWidth - 60, width: panelWidth + 60, height }); // Show panel + button with space for the button
+      mainWindow.setBounds({ x: width - panelWidth - 60, width: panelWidth + 60, height }); 
     } else {
-      mainWindow.setBounds({ x: width - 60, width: 60, height }); // Show only the button
+      mainWindow.setBounds({ x: width - 60, width: 60, height }); 
     }
   });
 }
