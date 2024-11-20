@@ -1,8 +1,10 @@
+/* General Styling */
 body, html {
     margin: 0;
     padding: 0;
     overflow: hidden;
     background: transparent;
+    font-family: 'Poppins', sans-serif; /* Clean and modern font */
 }
 
 .panel {
@@ -13,7 +15,6 @@ body, html {
     height: 100%;
     background: linear-gradient(135deg, #2c3e50, #34495e);
     display: flex;
-    align-items: start;
     flex-direction: column;
     padding: 10px;
     box-sizing: border-box;
@@ -40,6 +41,7 @@ body, html {
     color: #ffffff;
     cursor: pointer;
     transition: opacity 0.5s ease;
+    z-index: 10;
 }
 
 #toggleButton:hover {
@@ -53,47 +55,187 @@ body, html {
     height: 100%;
 }
 
+/* Header Section */
 .panel-header {
     text-align: center;
-    padding: 2px 0; 
-    font-size: 0.9em; 
-    line-height: 1.2; 
+    padding: 10px 10px;
+    font-size: 1.2em; 
+    line-height: 1.5; 
     background-color: #34495e;
     border-bottom: 1px solid #7f8c8d;
-}
-
-.toolbar {
     display: flex;
-    justify-content: space-around;
-    padding: 5px;
-    background-color: #34495e;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.toolbar-btn {
+.panel-header .title {
+    flex: 1;
+    text-align: left;
+    padding-left: 10px;
+    font-size: 2em; /* Larger title */
+    color: #ecf0f1;
+}
+
+.panel-header .settings-btn {
     background: none;
     border: none;
     color: #ecf0f1;
-    font-size: 1.2em;
+    font-size: 1.5em;
     cursor: pointer;
+    padding: 5px;
 }
 
-.toolbar-btn:hover {
+.panel-header .settings-btn:hover {
     color: #bdc3c7;
 }
 
+/* Dropdown Menu */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background: #ffffff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    z-index: 1000;
+    width: 220px;
+    padding: 5px;
+}
+
+.dropdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    font-size: 0.9em;
+    cursor: pointer;
+    color: #333;
+}
+
+.dropdown-item:hover {
+    background: #f4f4f4;
+}
+
+/* Separator Line */
 .separator-line {
-    border: 0;
+    border: none;
     height: 1px;
-    background: #7f8c8d;
+    background: #ddd;
     margin: 5px 0;
 }
 
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 16px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 16px;
+    transition: 0.4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: '';
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+input:checked + .slider {
+    background-color: #2196f3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(14px);
+}
+
+/* Content Area */
+#content-area {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 50px); /* Leave space for toolbar or other UI elements */
+    overflow: hidden; /* Prevent content from spilling out */
+    background-color: #ffffff;
+}
+
+/* Canvas */
+#drawing-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1;
+}
+
+/* Workspace */
+#workspace {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+/* Toolbar Section */
+#content-toolbar {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 3;
+    display: flex;
+    gap: 10px;
+}
+
+.content-btn {
+    padding: 8px 12px;
+    font-size: 1em;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.content-btn:hover {
+    background-color: #34495e;
+}
+
+/* Writable Area */
 .writable-area {
     flex: 1;
     padding: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #ecf0f1;
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .writable-area textarea {
@@ -102,10 +244,10 @@ body, html {
     resize: none;
     padding: 10px;
     font-size: 1em;
-    background-color: #ecf0f1;
-    color: #000000;
+    background-color: #ffffff;
+    color: #333333;
     border: none;
     outline: none;
-    box-shadow: inset 0px 0px 5px rgba(0,0,0,0.1);
     border-radius: 5px;
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
 }
