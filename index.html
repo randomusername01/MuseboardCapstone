@@ -4,35 +4,88 @@
   <meta charset="UTF-8">
   <title>MuseBoard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="content.css">
 </head>
 <body>
   <div class="panel">
-    <button id="toggleButton">←</button> 
-    
+    <button id="toggleButton">←</button>
+
     <div class="panel-content">
       <header class="panel-header">
-        <h1>MuseBoard</h1>
+        <span class="title">MuseBoard</span>
+        <button class="settings-btn" id="settingsButton">
+          <i class="fas fa-cog"></i>
+        </button>
+        <!-- Dropdown Menu -->
+        <div class="dropdown-menu" id="settingsDropdown">
+          <div class="dropdown-item" id="saveBtn">Save</div>
+          <div class="dropdown-item" id="saveAsBtn">Save As</div>
+          <hr class="separator-line">
+          <div class="dropdown-item">
+            <span>Launch on Start</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleLaunchStart">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="dropdown-item">
+            <span>Dark Mode</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleDarkMode">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="dropdown-item">
+            <span>Enable Auto Save</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleAutoSave">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <hr class="separator-line">
+          <div class="dropdown-item" data-action="customize-theme">Customize Theme</div>
+        </div>
       </header>
 
-      <!-- buttons -->
-      <section class="toolbar">
-        <button class="toolbar-btn" title="Text"><i class="fas fa-font"></i></button>
-        <button class="toolbar-btn" title="Image"><i class="fas fa-image"></i></button>
-        <button class="toolbar-btn" title="GIF">GIF</button>
-        <button class="toolbar-btn" title="Link"><i class="fas fa-link"></i></button>
-        <button class="toolbar-btn" title="Paint"><i class="fas fa-paint-brush"></i></button>
-      </section>
+      <!-- Content Area -->
+      <div id="content-area">
+        <div class="toolbar">
+          <button class="toolbar-btn" id="add-text-btn">
+            <i class="fas fa-font"></i>
+            <span>Text</span>
+          </button>
+          <button class="toolbar-btn" id="add-image-btn">
+            <i class="fas fa-image"></i>
+            <span>Image</span>
+          </button>
+          <button class="toolbar-btn" id="add-gif-btn">
+            <i class="fas fa-film"></i>
+            <span>GIF</span>
+          </button>
+          <button class="toolbar-btn" id="add-link-btn">
+            <i class="fas fa-link"></i>
+            <span>Link</span>
+          </button>
+          <button class="toolbar-btn" id="draw-btn">
+            <i class="fas fa-pencil-alt"></i>
+            <span>Draw</span>
+          </button>
+          <button class="toolbar-btn" id="clear-btn">
+            <i class="fas fa-eraser"></i>
+            <span>Clear</span>
+          </button>
+        </div>
 
-      <hr class="separator-line">
+        <canvas id="drawing-canvas"></canvas>
 
-      <!-- content area -->
-      <section class="writable-area">
-        <textarea placeholder="Write your notes here..."></textarea>
-      </section>
+        <div id="workspace"></div>
+      </div>
     </div>
   </div>
 
-  <script src="renderer.js"></script>
+  <script src="content.js" defer></script>
+  <script src="renderer.js" defer></script>
 </body>
 </html>

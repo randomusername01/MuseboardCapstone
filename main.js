@@ -1,16 +1,15 @@
 const { app, BrowserWindow, ipcMain, screen } = require('electron');
-const path = require('path');
 
 let mainWindow;
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const panelWidth = Math.floor(width / 3) - 40; 
+  const panelWidth = Math.floor(width / 3) - 40;
 
   mainWindow = new BrowserWindow({
-    width: 60, 
+    width: 60,
     height,
-    x: width - 60, 
+    x: width - 60,
     y: 0,
     frame: false,
     transparent: true,
@@ -24,17 +23,24 @@ function createWindow() {
 
   mainWindow.loadFile('index.html');
 
-  
   ipcMain.on('toggle-panel', (event, isVisible) => {
     if (isVisible) {
-      mainWindow.setBounds({ x: width - panelWidth - 60, width: panelWidth + 60, height }); 
+      mainWindow.setBounds({
+        x: width - panelWidth - 60,
+        width: panelWidth + 60,
+        height,
+      });
     } else {
-      mainWindow.setBounds({ x: width - 60, width: 60, height }); 
+      mainWindow.setBounds({
+        x: width - 60,
+        width: 60,
+        height,
+      });
     }
   });
 }
 
-app.on('ready', createWindow);
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
