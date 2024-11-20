@@ -36,15 +36,13 @@ settingsButton.addEventListener('click', (e) => {
 });
 
 settingsDropdown.addEventListener('click', (e) => {
-  e.stopPropagation(); // Prevent closing dropdown when clicking inside
+  e.stopPropagation(); 
 });
 
-// Close dropdown when clicking outside
 document.addEventListener('click', () => {
   settingsDropdown.style.display = 'none';
 });
 
-// Handle toggle actions
 toggleLaunchStart.addEventListener('change', () => {
   console.log(`Launch on Start: ${toggleLaunchStart.checked}`);
 });
@@ -57,20 +55,19 @@ toggleAutoSave.addEventListener('change', () => {
   console.log(`Auto Save: ${toggleAutoSave.checked}`);
 });
 
-// Save and Save As actions (from dropdown)
 const saveBtn = document.getElementById('saveBtn');
 const saveAsBtn = document.getElementById('saveAsBtn');
 
 if (saveBtn) {
   saveBtn.addEventListener('click', () => {
     console.log('Save clicked');
-    settingsDropdown.style.display = 'none'; // Close dropdown after clicking
+    settingsDropdown.style.display = 'none'; 
   });
 }
 
 if (saveAsBtn) {
   saveAsBtn.addEventListener('click', () => {
     console.log('Save As clicked');
-    settingsDropdown.style.display = 'none'; // Close dropdown after clicking
+    settingsDropdown.style.display = 'none'; 
   });
 }

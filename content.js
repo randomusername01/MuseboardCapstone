@@ -137,7 +137,6 @@ function makeDraggable(element) {
     });
 }
 
-// Event Listeners
 drawBtn.addEventListener("click", enableDrawing);
 addTextBtn.addEventListener("click", addText);
 addImageBtn.addEventListener("click", addImage);

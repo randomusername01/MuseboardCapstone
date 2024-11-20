@@ -1,10 +1,9 @@
-/* General Styling */
 body, html {
     margin: 0;
     padding: 0;
     overflow: hidden;
     background: transparent;
-    font-family: 'Poppins', sans-serif; /* Clean and modern font */
+    font-family: 'Poppins', sans-serif; 
 }
 
 .panel {
@@ -55,7 +54,6 @@ body, html {
     height: 100%;
 }
 
-/* Header Section */
 .panel-header {
     text-align: center;
     padding: 10px 10px;
@@ -72,7 +70,7 @@ body, html {
     flex: 1;
     text-align: left;
     padding-left: 10px;
-    font-size: 2em; /* Larger title */
+    font-size: 2em; 
     color: #ecf0f1;
 }
 
@@ -89,7 +87,6 @@ body, html {
     color: #bdc3c7;
 }
 
-/* Dropdown Menu */
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -117,7 +114,6 @@ body, html {
     background: #f4f4f4;
 }
 
-/* Separator Line */
 .separator-line {
     border: none;
     height: 1px;
@@ -125,7 +121,6 @@ body, html {
     margin: 5px 0;
 }
 
-/* Toggle Switch */
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -170,16 +165,14 @@ input:checked + .slider:before {
     transform: translateX(14px);
 }
 
-/* Content Area */
 #content-area {
     position: relative;
     width: 100%;
-    height: calc(100% - 50px); /* Leave space for toolbar or other UI elements */
-    overflow: hidden; /* Prevent content from spilling out */
+    height: calc(100% - 50px); 
+    overflow: hidden; 
     background-color: #ffffff;
 }
 
-/* Canvas */
 #drawing-canvas {
     position: absolute;
     top: 0;
@@ -190,7 +183,6 @@ input:checked + .slider:before {
     z-index: 1;
 }
 
-/* Workspace */
 #workspace {
     position: absolute;
     top: 0;
@@ -201,7 +193,6 @@ input:checked + .slider:before {
     pointer-events: auto;
 }
 
-/* Toolbar Section */
 #content-toolbar {
     position: absolute;
     bottom: 10px;
@@ -226,7 +217,6 @@ input:checked + .slider:before {
     background-color: #34495e;
 }
 
-/* Writable Area */
 .writable-area {
     flex: 1;
     padding: 10px;
