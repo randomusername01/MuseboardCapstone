@@ -122,14 +122,20 @@ function makeDraggable(element) {
 
   element.addEventListener("mousedown", (e) => {
     isDragging = true;
-    offsetX = e.offsetX;
-    offsetY = e.offsetY;
+    // Recording the initial mouse position and the current position of the element
+    startX = e.pageX;
+    startY = e.pageY;
+    elementX = parseInt(element.style.left || 0, 10);
+    elementY = parseInt(element.style.top || 0, 10);
   });
 
   document.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
-    element.style.left = `${e.pageX - offsetX}px`;
-    element.style.top = `${e.pageY - offsetY}px`;
+    // Calculating new position of element based on the difference from the starting mouse position
+    const deltaX = e.pageX - startX;
+    const deltaY = e.pageY - startY;
+    element.style.left = `${elementX + deltaX}px`;
+    element.style.top = `${elementY + deltaY}px`;
   });
 
   document.addEventListener("mouseup", () => {
