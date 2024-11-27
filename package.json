@@ -7,12 +7,13 @@
   "version": "1.0.0",
   "author": "benmolloy",
   "scripts": {
-    "start": "electron ."
+    "start": "nodemon --exec electron ."
   },
   "dependencies": {
     "electron-reload": "2.0.0-alpha.1"
   },
   "devDependencies": {
-    "electron": "32.1.2"
+    "electron": "^32.1.2",
+    "nodemon": "^3.1.7"
   }
 }
