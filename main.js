@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, dialog } = require('electron');
 
 let mainWindow;
 
@@ -52,4 +52,21 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+ipcMain.handle("select-file", async (event, fileType) => {
+  const filters = [
+    { name: "Images", extensions: ["jpg", "png", "jpeg"] },
+    { name: "GIFs", extensions: ["gif"] },
+  ];
+
+  const selectedFilter = fileType === "image" ? filters[0] : filters[1];
+
+  const result = await dialog.showOpenDialog({
+    properties: ["openFile"],
+    filters: [selectedFilter],
+  });
+
+  if (result.canceled) return null; // If the user canceled, return null
+  return result.filePaths[0]; // Return the first selected file path
 });

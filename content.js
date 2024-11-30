@@ -57,36 +57,44 @@ function addText() {
 
 // Add Image to Workspace
 function addImage() {
-  const imageUrl = prompt("Enter the image URL:");
-  if (!imageUrl) return;
-  const img = document.createElement("img");
-  img.src = imageUrl;
-  img.style.position = "absolute";
-  img.style.top = "150px";
-  img.style.left = "150px";
-  img.style.maxWidth = "200px";
-  img.style.cursor = "move";
-  workspace.appendChild(img);
+  ipcRenderer.invoke("select-file", "image").then((filePath) => {
+    if (!filePath) return;
 
-  // Enable dragging
-  makeDraggable(img);
+    const img = document.createElement("img");
+    img.src = filePath;
+    img.style.position = "absolute";
+    img.style.top = "150px";
+    img.style.left = "150px";
+    img.style.maxWidth = "200px";
+    img.style.border = "1px solid #ddd";
+    img.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.3)";
+    img.style.cursor = "move";
+    workspace.appendChild(img);
+
+    // Enable dragging
+    makeDraggable(img);
+  });
 }
 
 // Add GIF to Workspace
 function addGif() {
-  const gifUrl = prompt("Enter the GIF URL:");
-  if (!gifUrl) return;
-  const gif = document.createElement("img");
-  gif.src = gifUrl;
-  gif.style.position = "absolute";
-  gif.style.top = "200px";
-  gif.style.left = "200px";
-  gif.style.maxWidth = "200px";
-  gif.style.cursor = "move";
-  workspace.appendChild(gif);
+  ipcRenderer.invoke("select-file", "gif").then((filePath) => {
+    if (!filePath) return;
 
-  // Enable dragging
-  makeDraggable(gif);
+    const gif = document.createElement("img");
+    gif.src = filePath;
+    gif.style.position = "absolute";
+    gif.style.top = "200px";
+    gif.style.left = "200px";
+    gif.style.maxWidth = "200px";
+    gif.style.border = "1px solid #ddd";
+    gif.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.3)";
+    gif.style.cursor = "move";
+    workspace.appendChild(gif);
+
+    // Enable dragging
+    makeDraggable(gif);
+  });
 }
 
 // Add Link to Workspace
