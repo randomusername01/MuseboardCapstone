@@ -10,10 +10,13 @@
     "start": "nodemon --exec electron ."
   },
   "dependencies": {
-    "electron-reload": "2.0.0-alpha.1"
+    "electron-reload": "2.0.0-alpha.1",
+    "electron-settings": "^4.0.4",
+    "electron-store": "^10.0.0",
+    "fix-esm": "^1.0.1"
   },
   "devDependencies": {
-    "electron": "^32.1.2",
+    "electron": "^33.2.1",
     "nodemon": "^3.1.7"
   }
 }

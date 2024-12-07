@@ -1,4 +1,20 @@
 const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const settings = require('electron-settings');
+
+// Defining default settings
+const defaultSettings = {
+  launchOnStart: false,
+  darkMode: false,
+  autoSave: false,
+  customTheme: false
+};
+
+// Checking if settings are set and assign default settings if not set
+for (const [key, value] of Object.entries(defaultSettings)) {
+  if (!settings.hasSync(key)) {
+    settings.setSync(key, value);
+  }
+}
 
 let mainWindow;
 
