@@ -6,6 +6,8 @@ function applySettings(settings) {
   } else {
     document.documentElement.classList.remove('dark-mode');
   }
+
+  ipcRenderer.send('toggle-launch-on-startup', settings.launchOnStart);
 }
 
 ipcRenderer.on('apply-settings', (e, settings) => {
