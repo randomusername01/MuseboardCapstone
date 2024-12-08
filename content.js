@@ -11,25 +11,61 @@ const addLinkBtn = document.getElementById("add-link-btn");
 const drawBtn = document.getElementById("draw-btn");
 const clearBtn = document.getElementById("clear-btn");
 
-// Enable Drawing Mode
-let isDrawing = false;
-function enableDrawing() {
-  isDrawing = true;
-  canvas.addEventListener("mousedown", startDrawing);
-  canvas.addEventListener("mousemove", draw);
-  canvas.addEventListener("mouseup", stopDrawing);
+function resizeCanvas() {
+  const toolbarHeight = document.querySelector('.toolbar').offsetHeight || 0;
+  canvas.width = workspace.offsetWidth;
+  canvas.height = workspace.offsetHeight - toolbarHeight;
+  canvas.style.top = `${toolbarHeight}px`;
 }
 
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+let drawingEnabled = false;
+
+const colorPicker = document.getElementById("color-picker");
+const lineWidth = document.getElementById("line-width");
+
+function enableDrawing() {
+  drawingEnabled = !drawingEnabled;
+  drawBtn.classList.toggle("active", drawingEnabled);
+
+  if (drawingEnabled) {
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDrawing);
+    canvas.style.pointerEvents = "auto";
+  } else {
+    canvas.removeEventListener("mousedown", startDrawing);
+    canvas.removeEventListener("mousemove", draw);
+    canvas.removeEventListener("mouseup", stopDrawing);
+    canvas.style.pointerEvents = "none";
+  }
+}
+function getMousePosition(canvas, event) {
+  const rect = canvas.getBoundingClientRect();
+  const offsetFix = 18;
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top - offsetFix,
+  };
+}
+
+
+
 function startDrawing(e) {
+  const pos = getMousePosition(canvas, e);
   ctx.beginPath();
-  ctx.moveTo(e.offsetX, e.offsetY);
+  ctx.moveTo(pos.x, pos.y);
+  isDrawing = true;
 }
 
 function draw(e) {
   if (!isDrawing) return;
-  ctx.lineTo(e.offsetX, e.offsetY);
-  ctx.strokeStyle = "#34495e";
-  ctx.lineWidth = 2;
+  const pos = getMousePosition(canvas, e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.strokeStyle = colorPicker.value;
+  ctx.lineWidth = lineWidth.value;
   ctx.stroke();
 }
 
@@ -120,8 +156,9 @@ function addLink() {
 // Clear Workspace
 function clearContent() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  workspace.innerHTML = "";
+  workspace.innerHTML = ""; // Removes all added elements
 }
+
 
 // Make Element Draggable
 function makeDraggable(element) {
