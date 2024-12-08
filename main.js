@@ -18,7 +18,8 @@ for (const [key, value] of Object.entries(defaultSettings)) {
 
 let mainWindow;
 
-function createWindow() {
+async function createWindow() {
+  const currentSettings = await settings.get();
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const panelWidth = Math.floor(width / 3) - 40;
 
@@ -38,6 +39,11 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+
+  // Applying settings to renderer after it's loaded
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('apply-settings', currentSettings);
+  });
 
   ipcMain.on('toggle-panel', (event, isVisible) => {
     if (isVisible) {

@@ -1,5 +1,17 @@
 const { ipcRenderer } = require('electron');
 
+function applySettings(settings) {
+  if (settings.darkMode) {
+    document.documentElement.classList.add('dark-mode');
+  } else {
+    document.documentElement.classList.remove('dark-mode');
+  }
+}
+
+ipcRenderer.on('apply-settings', (e, settings) => {
+  applySettings(settings);
+});
+
 // Load settings from the main process (ensure you get the latest settings from the settings.json file)
 async function loadSettings() {
   const settings = await ipcRenderer.invoke('get-settings');
@@ -11,6 +23,10 @@ async function loadSettings() {
 async function saveSetting(key, value) {
   // Calling the main process to save the setting
   await ipcRenderer.invoke('save-setting', key, value);
+
+  // After saving, reload and apply the settings
+  const settings = await ipcRenderer.invoke('get-settings');
+  applySettings(settings);
 }
 
 const panel = document.querySelector('.panel');
