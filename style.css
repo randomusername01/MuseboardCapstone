@@ -251,3 +251,15 @@ html.dark-mode #content-area {
 html.dark-mode #workspace {
     color: #f5f5f5;
 }
+
+html.dark-mode .dropdown-menu {
+    background-color: #303030;
+}
+
+html.dark-mode .dropdown-item {
+    color: #ffffff;
+}
+
+html.dark-mode .dropdown-item:hover {
+    background-color: #676767;
+}
