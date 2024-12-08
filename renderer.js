@@ -99,6 +99,7 @@ document.getElementById('apply-theme-btn').addEventListener('click', () => {
   const primaryColor = document.getElementById('primary-color-picker').value;
   const secondaryColor = document.getElementById('secondary-color-picker').value;
 
+  // Storing theme settings in local storage
   localStorage.setItem('primaryColor', primaryColor);
   localStorage.setItem('secondaryColor', secondaryColor);
 
@@ -114,6 +115,10 @@ document.getElementById('reset-theme-btn').addEventListener('click', () => {
   // Reset color pickers to default
   document.getElementById('primary-color-picker').value = DEFAULT_PRIMARY_COLOR;
   document.getElementById('secondary-color-picker').value = DEFAULT_SECONDARY_COLOR;
+
+  // Storing theme settings in local storage
+  localStorage.setItem('primaryColor', DEFAULT_PRIMARY_COLOR);
+  localStorage.setItem('secondaryColor', DEFAULT_SECONDARY_COLOR);
 
   // Reset the applied theme
   document.documentElement.style.setProperty('--primary-color', DEFAULT_PRIMARY_COLOR);
