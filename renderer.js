@@ -1,5 +1,11 @@
 const { ipcRenderer } = require('electron');
 
+async function loadSettings() {
+  const settings = await ipcRenderer.invoke('get-settings');
+  console.log('Loaded settings:', settings);
+  return settings;
+}
+
 const panel = document.querySelector('.panel');
 const toggleButton = document.getElementById('toggleButton');
 const settingsButton = document.getElementById('settingsButton');
@@ -11,6 +17,16 @@ const toggleAutoSave = document.getElementById('toggleAutoSave');
 let isPanelVisible = false;
 
 toggleButton.innerHTML = isPanelVisible ? '→' : '←';
+
+// Loading settings and initializing the UI
+loadSettings().then((settings) => {
+  // Initializing UI elements based on the saved settings
+  if (settings) {
+    toggleLaunchStart.checked = settings.launchOnStart || false;
+    toggleDarkMode.checked = settings.darkMode || false;
+    toggleAutoSave.checked = settings.autoSave || false;
+  }
+});
 
 function togglePanel() {
   isPanelVisible = !isPanelVisible;

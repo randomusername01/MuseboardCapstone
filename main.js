@@ -56,7 +56,16 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+  // Registering IPC handler for getting settings
+  ipcMain.handle('get-settings', async () => {
+    const allSettings = await settings.get();
+    return allSettings;
+  });
+
+  // Creating the main window.
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
