@@ -57,11 +57,17 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  // Registering IPC handler for getting settings
+  // IPC handler for getting settings
   ipcMain.handle('get-settings', async () => {
     const allSettings = await settings.get();
     return allSettings;
   });
+
+  // IPC handler for saving individual settings
+  ipcMain.handle('save-setting', async (e, key, value) => {
+    await settings.set(key, value);
+    console.log(`Saved setting ${key} with value ${value}`);
+  })
 
   // Creating the main window.
   createWindow();

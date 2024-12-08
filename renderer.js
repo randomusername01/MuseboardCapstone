@@ -1,9 +1,16 @@
 const { ipcRenderer } = require('electron');
 
+// Load settings from the main process (ensure you get the latest settings from the settings.json file)
 async function loadSettings() {
   const settings = await ipcRenderer.invoke('get-settings');
   console.log('Loaded settings:', settings);
   return settings;
+}
+
+// Function to save a setting to the settings file
+async function saveSetting(key, value) {
+  // Calling the main process to save the setting
+  await ipcRenderer.invoke('save-setting', key, value);
 }
 
 const panel = document.querySelector('.panel');
@@ -59,16 +66,16 @@ document.addEventListener('click', () => {
   settingsDropdown.style.display = 'none';
 });
 
-toggleLaunchStart.addEventListener('change', () => {
-  console.log(`Launch on Start: ${toggleLaunchStart.checked}`);
+toggleLaunchStart.addEventListener('change', (e) => {
+  saveSetting('launchOnStart', e.target.checked);
 });
 
-toggleDarkMode.addEventListener('change', () => {
-  console.log(`Dark Mode: ${toggleDarkMode.checked}`);
+toggleDarkMode.addEventListener('change', (e) => {
+  saveSetting('darkMode', e.target.checked);
 });
 
-toggleAutoSave.addEventListener('change', () => {
-  console.log(`Auto Save: ${toggleAutoSave.checked}`);
+toggleAutoSave.addEventListener('change', (e) => {
+  saveSetting('autoSave', e.target.checked);
 });
 
 const saveBtn = document.getElementById('saveBtn');
