@@ -1,5 +1,8 @@
 const { ipcRenderer } = require('electron');
 
+const DEFAULT_PRIMARY_COLOR = '#34495E';
+const DEFAULT_SECONDARY_COLOR = '#2C3E50';
+
 function applySettings(settings) {
   if (settings.darkMode) {
     document.documentElement.classList.add('dark-mode');
@@ -84,8 +87,54 @@ document.addEventListener('click', () => {
   settingsDropdown.style.display = 'none';
 });
 
+// Theme Customizer Toggle
+document.querySelector('[data-action="customize-theme"]').addEventListener('click', () => {
+  const themeCustomizer = document.getElementById('theme-customizer');
+  // Toggle visibility of the customizer
+  themeCustomizer.style.display = themeCustomizer.style.display === 'none' ? 'block' : 'none';
+});
+
+// Apply Theme logic
+document.getElementById('apply-theme-btn').addEventListener('click', () => {
+  const primaryColor = document.getElementById('primary-color-picker').value;
+  const secondaryColor = document.getElementById('secondary-color-picker').value;
+
+  localStorage.setItem('primaryColor', primaryColor);
+  localStorage.setItem('secondaryColor', secondaryColor);
+
+  // Update the CSS variables
+  document.documentElement.style.setProperty('--primary-color', primaryColor);
+  document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+
+  alert(`Primary color set to ${primaryColor}, Secondary color set to ${secondaryColor}`);
+});
+
+// Reset to Default logic
+document.getElementById('reset-theme-btn').addEventListener('click', () => {
+  // Reset color pickers to default
+  document.getElementById('primary-color-picker').value = DEFAULT_PRIMARY_COLOR;
+  document.getElementById('secondary-color-picker').value = DEFAULT_SECONDARY_COLOR;
+
+  // Reset the applied theme
+  document.documentElement.style.setProperty('--primary-color', DEFAULT_PRIMARY_COLOR);
+  document.documentElement.style.setProperty('--secondary-color', DEFAULT_SECONDARY_COLOR);
+
+  alert('Theme reset to default!');
+});
+
+
 toggleLaunchStart.addEventListener('change', (e) => {
   saveSetting('launchOnStart', e.target.checked);
+});
+
+window.addEventListener('load', () => {
+  const primaryColor = localStorage.getItem('primaryColor');
+  const secondaryColor = localStorage.getItem('secondaryColor');
+
+  if (primaryColor && secondaryColor) {
+    document.documentElement.style.setProperty('--primary-color', primaryColor);
+    document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+  }
 });
 
 toggleDarkMode.addEventListener('change', (e) => {

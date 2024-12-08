@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>MuseBoard</title>
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="content.css">
 </head>
+
 <body>
   <div class="panel">
     <button id="toggleButton">←</button>
@@ -46,6 +48,21 @@
           </div>
           <hr class="separator-line">
           <div class="dropdown-item" data-action="customize-theme">Customize Theme</div>
+        </div>
+        <!-- Theme Customizer -->
+        <div id="theme-customizer" style="display: none;">
+          <label>
+            Primary Color:
+            <input type="color" id="primary-color-picker" value="#3B82F6"> <!-- Default Blue -->
+          </label>
+          <br>
+          <label>
+            Secondary Color:
+            <input type="color" id="secondary-color-picker" value="#1E3A8A"> <!-- Default Darker Blue -->
+          </label>
+          <br>
+          <button id="apply-theme-btn">Apply Theme</button>
+          <button id="reset-theme-btn">Reset to Default</button>
         </div>
       </header>
 
@@ -88,4 +105,5 @@
   <script src="content.js" defer></script>
   <script src="renderer.js" defer></script>
 </body>
+
 </html>

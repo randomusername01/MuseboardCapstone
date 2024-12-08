@@ -8,8 +8,7 @@ const AUTO_LAUNCH_NAME = 'MuseBoard';
 const DEFAULT_SETTINGS = {
   launchOnStart: false,
   darkMode: false,
-  autoSave: false,
-  customTheme: false
+  autoSave: false
 };
 
 // Initialize AutoLaunch
