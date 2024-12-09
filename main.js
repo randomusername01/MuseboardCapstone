@@ -61,6 +61,21 @@ async function createWindow() {
     mainWindow.webContents.send('apply-settings', currentSettings);
   });
 
+  ipcMain.on('open-theme-customizer', () => {
+    const modalWindow = new BrowserWindow({
+      parent: mainWindow,
+      modal: true,
+      width: 400,
+      height: 300,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+      }
+    });
+
+    modalWindow.loadFile('theme-customizer.html');
+  });
+
   // Handle panel toggle
   ipcMain.on('toggle-panel', (event, isVisible) => {
     mainWindow.setBounds({
