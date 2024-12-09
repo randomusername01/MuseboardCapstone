@@ -1,19 +1,41 @@
 {
-  "name": "physical-paste-expedite-1x1ra",
-  "productName": "physical-paste-expedite-1x1ra",
+  "name": "MuseBoard",
+  "productName": "MuseBoard",
   "description": "My Electron application description",
   "keywords": [],
   "main": "./main.js",
   "version": "1.0.0",
   "author": "benmolloy",
   "scripts": {
-    "start": "nodemon --exec electron ."
+    "start": "nodemon --exec electron .",
+    "build": "electron-builder"
   },
   "dependencies": {
-    "electron-reload": "2.0.0-alpha.1"
+    "auto-launch": "^5.0.6",
+    "electron-reload": "2.0.0-alpha.1",
+    "electron-settings": "^4.0.4",
+    "electron-store": "^10.0.0",
+    "fix-esm": "^1.0.1"
   },
   "devDependencies": {
-    "electron": "^32.1.2",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
     "nodemon": "^3.1.7"
+  },
+  "build": {
+    "appId": "com.ase330.museboard",
+    "productName": "MuseBoard",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icons/museboard-icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icons/museboard-icon.png"
+    }
   }
 }

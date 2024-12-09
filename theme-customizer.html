@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customize Theme</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background-color: #b2b2b2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #theme-customizer {
+        width: 300px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-custom {
+        padding: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Theme Customizer -->
+    <div id="theme-customizer">
+      <label>
+        Primary Color:
+        <input type="color" id="primary-color-picker" value="#34495E" />
+      </label>
+      <br />
+      <label>
+        Secondary Color:
+        <input type="color" id="secondary-color-picker" value="#2C3E50" />
+      </label>
+      <br />
+      <div class="d-flex justify-content-center gap-1">
+        <button id="apply-theme-btn" class="btn btn-primary btn-custom">
+          Apply Theme
+        </button>
+        <button id="reset-theme-btn" class="btn btn-secondary btn-custom">
+          Reset to Default
+        </button>
+      </div>
+      <div class="d-flex justify-content-center mt-1">
+        <button id="close-window-btn" class="btn btn-danger btn-custom">
+          Close Window
+        </button>
+      </div>
+    </div>
+
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const { ipcRenderer } = require("electron");
+      const DEFAULT_PRIMARY_COLOR = "#34495E";
+      const DEFAULT_SECONDARY_COLOR = "#2C3E50";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const primaryColorPicker = document.getElementById(
+          "primary-color-picker"
+        );
+        const secondaryColorPicker = document.getElementById(
+          "secondary-color-picker"
+        );
+
+        // Load saved colors from localStorage
+        const primaryColor =
+          localStorage.getItem("primaryColor") || DEFAULT_PRIMARY_COLOR;
+        const secondaryColor =
+          localStorage.getItem("secondaryColor") || DEFAULT_SECONDARY_COLOR;
+        primaryColorPicker.value = primaryColor;
+        secondaryColorPicker.value = secondaryColor;
+
+        // Save colors immediately on change
+        primaryColorPicker.addEventListener("input", () => {
+          localStorage.setItem("primaryColor", primaryColorPicker.value);
+        });
+
+        secondaryColorPicker.addEventListener("input", () => {
+          localStorage.setItem("secondaryColor", secondaryColorPicker.value);
+        });
+
+        // Apply Theme logic
+        document
+          .getElementById("apply-theme-btn")
+          .addEventListener("click", () => {
+            const primaryColor = primaryColorPicker.value;
+            const secondaryColor = secondaryColorPicker.value;
+
+            // Update the CSS variables
+            document.documentElement.style.setProperty(
+              "--primary-color",
+              primaryColor
+            );
+            document.documentElement.style.setProperty(
+              "--secondary-color",
+              secondaryColor
+            );
+
+            ipcRenderer.send(
+              "update-theme-colors",
+              primaryColor,
+              secondaryColor
+            );
+          });
+
+        // Reset to Default logic
+        document
+          .getElementById("reset-theme-btn")
+          .addEventListener("click", () => {
+            primaryColorPicker.value = DEFAULT_PRIMARY_COLOR;
+            secondaryColorPicker.value = DEFAULT_SECONDARY_COLOR;
+
+            // Save default theme settings
+            localStorage.setItem("primaryColor", DEFAULT_PRIMARY_COLOR);
+            localStorage.setItem("secondaryColor", DEFAULT_SECONDARY_COLOR);
+
+            // Reset the applied theme
+            document.documentElement.style.setProperty(
+              "--primary-color",
+              DEFAULT_PRIMARY_COLOR
+            );
+            document.documentElement.style.setProperty(
+              "--secondary-color",
+              DEFAULT_SECONDARY_COLOR
+            );
+
+            ipcRenderer.send(
+              "update-theme-colors",
+              DEFAULT_PRIMARY_COLOR,
+              DEFAULT_SECONDARY_COLOR
+            );
+          });
+
+        // Close Window logic
+        document
+          .getElementById("close-window-btn")
+          .addEventListener("click", () => {
+            ipcRenderer.send("close-window");
+          });
+      });
+    </script>
+  </body>
+</html>

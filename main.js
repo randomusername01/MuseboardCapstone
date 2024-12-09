@@ -1,14 +1,50 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Menu } = require("electron");
+const path = require("path");
+const settings = require("electron-settings");
+const AutoLaunch = require("auto-launch");
+
+const ICON_PATH = path.join(__dirname, "assets/icons/museboard-icon.png");
+const AUTO_LAUNCH_NAME = "MuseBoard";
+const DEFAULT_SETTINGS = {
+  launchOnStart: false,
+  darkMode: false,
+  autoSave: false,
+};
 
 let mainWindow;
+let modalWindow; // Declare the modalWindow variable outside the handler to keep track of it
 
-function createWindow() {
+// Initialize AutoLaunch
+const autoLauncher = new AutoLaunch({
+  name: AUTO_LAUNCH_NAME,
+  path: app.getPath("exe"),
+});
+
+// Set default settings if not already set
+const setDefaultSettings = () => {
+  Object.entries(DEFAULT_SETTINGS).forEach(([key, value]) => {
+    if (!settings.hasSync(key)) {
+      settings.setSync(key, value);
+    }
+  });
+};
+
+// Auto-launch enable/disable function
+const setAutoLaunch = (enabled) => {
+  enabled ? autoLauncher.enable() : autoLauncher.disable();
+  console.log(`AUTO LAUNCH ${enabled ? "ENABLED" : "DISABLED"}`);
+};
+
+// Create main window
+async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const panelWidth = Math.floor(width / 3) - 40;
+  const currentSettings = await settings.get();
 
   mainWindow = new BrowserWindow({
     width: 60,
     height,
+    icon: ICON_PATH,
     x: width - 60,
     y: 0,
     frame: false,
@@ -21,35 +57,84 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile("index.html");
 
-  ipcMain.on('toggle-panel', (event, isVisible) => {
-    if (isVisible) {
-      mainWindow.setBounds({
-        x: width - panelWidth - 60,
-        width: panelWidth + 60,
-        height,
-      });
-    } else {
-      mainWindow.setBounds({
-        x: width - 60,
-        width: 60,
-        height,
-      });
-    }
+  // Send settings to renderer after window is loaded
+  mainWindow.webContents.on("did-finish-load", () => {
+    mainWindow.webContents.send("apply-settings", currentSettings);
+  });
+
+  ipcMain.on("open-theme-customizer", () => {
+    // Create the modal window
+    modalWindow = new BrowserWindow({
+      parent: mainWindow,
+      modal: true,
+      width: 400,
+      height: 300,
+      resizable: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
+    });
+
+    modalWindow.loadFile("theme-customizer.html");
+
+    // Handle the close window event for modal window
+    ipcMain.once("close-window", () => {
+      if (modalWindow) {
+        modalWindow.close(); // Close modal window
+      }
+    });
+  });
+
+  // Handle panel toggle
+  ipcMain.on("toggle-panel", (event, isVisible) => {
+    mainWindow.setBounds({
+      x: isVisible ? width - panelWidth - 60 : width - 60,
+      width: isVisible ? panelWidth + 60 : 60,
+      height,
+    });
   });
 }
 
-app.whenReady().then(createWindow);
+// IPC Handlers
+const setupIpcHandlers = () => {
+  ipcMain.handle("get-settings", async () => await settings.get());
+  ipcMain.handle("save-setting", async (e, key, value) => {
+    await settings.set(key, value);
+    console.log(`Saved setting ${key} with value ${value}`);
+  });
+  ipcMain.on("toggle-launch-on-startup", (e, isEnabled) =>
+    setAutoLaunch(isEnabled)
+  );
+  ipcMain.on("update-theme-colors", (e, newPrimaryColor, newSecondaryColor) => {
+    if (mainWindow) {
+      mainWindow.webContents.send(
+        "update-theme-colors",
+        newPrimaryColor,
+        newSecondaryColor
+      );
+    }
+  });
+};
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+// Electron App Lifecycle
+app.whenReady().then(() => {
+  Menu.setApplicationMenu(null);
+  setDefaultSettings();
+  setupIpcHandlers();
+  createWindow();
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-app.on('activate', () => {
-  if (mainWindow === null) {
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
