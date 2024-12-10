@@ -205,18 +205,16 @@ if (openBtn) {
         // Extract the workspace HTML and metadata
         const { html, metadata } = boardData;
 
-        // Replace the workspace content with the loaded HTML
+        // Create a temporary div to parse the HTML and preserve the entire element structure
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        // Find the workspace element within the loaded HTML
+        const newWorkspace = tempDiv.firstChild;
+
+        // Replace the entire workspace element with the new one
         const workspace = document.querySelector('#workspace');
-        workspace.innerHTML = html;
-
-        // Optionally, apply any other metadata like dimensions, positions, etc.
-        workspace.style.width = metadata.width + 'px';
-        workspace.style.height = metadata.height + 'px';
-        workspace.style.top = metadata.top;
-        workspace.style.left = metadata.left;
-
-        // Since images are embedded in the src of the HTML, no need to separately handle them
-        // They are already embedded as base64 within the 'html' itself
+        workspace.replaceWith(newWorkspace); // Replace the entire workspace element with the new one
 
         alert('Board loaded successfully!');
       } else {
@@ -226,6 +224,7 @@ if (openBtn) {
       console.error('Error opening board:', error);
       alert('An error occurred while opening the board file.');
     }
+    settingsDropdown.style.display = "none";
   });
 }
 
