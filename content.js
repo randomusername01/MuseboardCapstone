@@ -134,6 +134,42 @@ function addImage(filePath = null, top = "150px", left = "150px") {
   }
 }
 
+// Add GIF to Workspace
+function addGif(src = null, top = "200px", left = "200px") {
+  // If src is not provided, prompt the user to select a file
+  if (!src) {
+    ipcRenderer.invoke("select-file", "gif").then((selectedFilePath) => {
+      if (!selectedFilePath) return;
+
+      // Create GIF element and set properties
+      const gif = document.createElement("img");
+      gif.src = selectedFilePath;  // Set the src to the selected file path
+      gif.style.position = "absolute";
+      gif.style.top = top;  // Set the top position to the provided or default value
+      gif.style.left = left;  // Set the left position to the provided or default value
+      gif.style.maxWidth = "200px";
+      gif.style.cursor = "move";
+      workspace.appendChild(gif);
+
+      // Enable dragging functionality
+      makeDraggable(gif);
+    });
+  } else {
+    // Create GIF element with provided src
+    const gif = document.createElement("img");
+    gif.src = src;  // Set the src to the provided or selected URL
+    gif.style.position = "absolute";
+    gif.style.top = top;  // Set the top position to the provided or default value
+    gif.style.left = left;  // Set the left position to the provided or default value
+    gif.style.maxWidth = "200px";
+    gif.style.cursor = "move";
+    workspace.appendChild(gif);
+
+    // Enable dragging functionality
+    makeDraggable(gif);
+  }
+}
+
 const { shell } = require("electron");
 
 // Create link 
