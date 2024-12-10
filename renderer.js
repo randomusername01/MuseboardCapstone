@@ -1,5 +1,34 @@
 const { ipcRenderer } = require("electron");
 
+// let workspace = document.getElementById('workspace');
+
+function grabWorkspace() {
+  // Serialize the entire workspace
+  const workSpaceHTML = workspace.outerHTML;
+
+  // Get workspace dimensions and position
+  const workspaceMetadata = {
+    width: workspace.offsetWidth,
+    height: workspace.offsetHeight,
+    top: workspace.style.top || '0px',
+    left: workspace.style.left || '0px'
+  };
+
+  return {
+    html: workSpaceHTML,
+    metadata: workspaceMetadata
+  }
+}
+
+const saveBoard = async (boardData) => {
+  const result = await ipcRenderer.invoke('save-board', boardData);
+  if (result.success) {
+    alert(`Board saved to ${result.filePath}`);
+  } else {
+    alert(`Failed to save board: ${result.error}`);
+  }
+}
+
 function applySettings(settings) {
   if (settings.darkMode) {
     document.documentElement.classList.add("dark-mode");
@@ -136,6 +165,8 @@ const saveAsBtn = document.getElementById("saveAsBtn");
 if (saveBtn) {
   saveBtn.addEventListener("click", () => {
     console.log("Save clicked");
+    let workspaceData = grabWorkspace();
+    saveBoard(workspaceData);
     settingsDropdown.style.display = "none";
   });
 }

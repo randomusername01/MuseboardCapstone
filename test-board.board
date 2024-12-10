@@ -1,0 +1,9 @@
+{
+  "html": "<div id=\"workspace\"><div data-type=\"text\" contenteditable=\"true\" style=\"position: absolute; top: 100px; left: 100px; font-size: 1em; cursor: move;\">Type your text here...</div><div data-type=\"link\" style=\"position: absolute; top: 250px; left: 250px; padding-right: 10px; display: inline-block;\"><a href=\"https://youtube.com\" target=\"_blank\" style=\"color: rgb(41, 128, 185); font-size: 1em; cursor: pointer;\">https://youtube.com</a><button class=\"edit-link-btn\" style=\"position: absolute; right: -15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; background: rgb(189, 195, 199); border: none; border-radius: 4px; cursor: pointer; box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px; justify-content: center; align-items: center; display: none;\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"white\" width=\"14px\" height=\"14px\">\n      <path d=\"M14.69,2.92,20.07,8.3a1,1,0,0,1,0,1.41l-9.9,9.9a1,1,0,0,1-.32.22L5.38,21.82a1,1,0,0,1-1.28-1.28l1.39-4.47a1,1,0,0,1,.22-.32l9.9-9.9A1,1,0,0,1,14.69,2.92ZM6.47,17.53l2,2,6.34-6.34-2-2Z\"></path>\n    </svg>\n  </button></div></div>",
+  "metadata": {
+    "width": 470,
+    "height": 668,
+    "top": "0px",
+    "left": "0px"
+  }
+}
