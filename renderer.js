@@ -82,7 +82,7 @@ async function grabWorkspaceAndCanvas() {
   return {
       html: workspaceHTML,
       metadata: workspaceMetadata,
-      canvas: canvasState, // Include canvas data if a canvas exists
+      canvasState: canvasState,
   };
 }
 
@@ -125,6 +125,7 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
     const elements = newWorkspace.children;
     Array.from(elements).forEach((element) => {
       console.log(element);
+
       // Adding text
       if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'text') {
         addText(element.innerText, element.style.top, element.style.left);
@@ -143,8 +144,43 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
         createLinkElement(anchor.href, element.style.top, element.style.left);
       }
     });
-  } else {
-    console.error("Parsed workspace is empty or invalid");
+
+    // Handle the canvas outside the workspace
+    const storedCanvas = boardData.canvasState;
+    console.log(storedCanvas.canvasAttributes);
+
+    if (storedCanvas) {
+      // Locate the div.content-area and replace its canvas
+      const contentArea = document.querySelector('#content-area');
+      if (contentArea) {
+        const existingCanvas = contentArea.querySelector('canvas');
+
+        // Create a new canvas and copy attributes from the saved canvas
+        const newCanvas = document.createElement('canvas');
+        for (const [name, value] of Object.entries(storedCanvas.canvasAttributes)) {
+          newCanvas.setAttribute(name, value);
+        }
+
+        // Restore the drawing data on the new canvas
+        const ctx = newCanvas.getContext('2d');
+        const img = new Image();
+        console.log(storedCanvas.canvasState);
+        img.src = boardData.canvasState.drawingData;
+        console.log(img.src);
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0);
+        };
+
+        // Replace the existing canvas with the new canvas
+        if (existingCanvas) {
+          contentArea.replaceChild(newCanvas, existingCanvas); // Replace the existing canvas
+        } else {
+          contentArea.appendChild(newCanvas); // Append if no canvas exists
+        }
+      }
+    } else {
+      console.error("Parsed workspace is empty or invalid");
+    }
   }
 });
 
