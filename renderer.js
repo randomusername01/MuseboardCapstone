@@ -190,8 +190,44 @@ toggleAutoSave.addEventListener("change", (e) => {
   saveSetting("autoSave", e.target.checked);
 });
 
+const openBtn = document.getElementById("openBtn");
 const saveBtn = document.getElementById("saveBtn");
 const saveAsBtn = document.getElementById("saveAsBtn");
+
+if (openBtn) {
+  openBtn.addEventListener("click", async () => {
+    try {
+      // Trigger the main process to open a file dialog and select a .board file
+      const result = await ipcRenderer.invoke('open-board-file');
+      if (result && result.success) {
+        const boardData = result.boardData; // The parsed board data from the .board file
+
+        // Extract the workspace HTML and metadata
+        const { html, metadata } = boardData;
+
+        // Replace the workspace content with the loaded HTML
+        const workspace = document.querySelector('#workspace');
+        workspace.innerHTML = html;
+
+        // Optionally, apply any other metadata like dimensions, positions, etc.
+        workspace.style.width = metadata.width + 'px';
+        workspace.style.height = metadata.height + 'px';
+        workspace.style.top = metadata.top;
+        workspace.style.left = metadata.left;
+
+        // Since images are embedded in the src of the HTML, no need to separately handle them
+        // They are already embedded as base64 within the 'html' itself
+
+        alert('Board loaded successfully!');
+      } else {
+        alert('Failed to open the board file.');
+      }
+    } catch (error) {
+      console.error('Error opening board:', error);
+      alert('An error occurred while opening the board file.');
+    }
+  });
+}
 
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {

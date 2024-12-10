@@ -122,6 +122,28 @@ const setupIpcHandlers = () => {
       );
     }
   });
+  ipcMain.handle('open-board-file', async () => {
+    try {
+      // Open a dialog to select a .board file
+      const result = await dialog.showOpenDialog({
+        filters: [{ name: 'Board Files', extensions: ['board'] }],
+        properties: ['openFile']
+      });
+  
+      if (result.canceled || result.filePaths.length === 0) {
+        return { success: false }; // No file selected
+      }
+  
+      const filePath = result.filePaths[0];
+      const fileContent = fs.readFileSync(filePath, 'utf-8'); // Read the file content
+      const boardData = JSON.parse(fileContent); // Parse the file (assuming JSON format)
+  
+      return { success: true, boardData }; // Return the parsed data
+    } catch (error) {
+      console.error('Error opening board file:', error);
+      return { success: false, error: error.message };
+    }
+  });
   ipcMain.handle('save-board', async (e, data) => {
     const { canceled, filePath } = await dialog.showSaveDialog({
       filters: [
