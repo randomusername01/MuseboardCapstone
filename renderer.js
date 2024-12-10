@@ -35,37 +35,56 @@ function convertImageToBase64(imagePath) {
 }
 
 
-async function grabWorkspace() {
+async function grabWorkspaceAndCanvas() {
   // Get all image elements in the workspace
   const images = document.querySelectorAll('#workspace img');
-  
+
   // Replace image paths with base64 data
   for (const img of images) {
-    const src = img.src;
-    if (src.startsWith('file://')) {
-      // Assuming it's a local file path, convert it to base64
-      const base64Src = await convertImageToBase64(src);
-      img.src = base64Src; // Replace the image's source with the base64 string
-    }
+      const src = img.src;
+      if (src.startsWith('file://')) {
+          // Assuming it's a local file path, convert it to base64
+          const base64Src = await convertImageToBase64(src);
+          img.src = base64Src; // Replace the image's source with the base64 string
+      }
   }
 
-  // Serialize the entire workspace
-  const workSpaceHTML = workspace.outerHTML;
+  // Get the canvas element in the workspace
+  const canvas = document.querySelector('canvas');
+  let canvasState = null;
+
+  if (canvas) {
+      // Capture the drawing data and attributes of the canvas
+      const drawingData = canvas.toDataURL(); // Get base64 data for canvas drawing
+      const canvasAttributes = {};
+      for (const attr of canvas.attributes) {
+        canvasAttributes[attr.name] = attr.value;
+    }
+
+      // Store the canvas data and attributes
+      canvasState = {
+          drawingData,
+          canvasAttributes,
+      };
+  }
+
+  // Serialize the entire workspace HTML
+  const workspaceHTML = workspace.outerHTML;
 
   // Get workspace dimensions and position
   const workspaceMetadata = {
-    width: workspace.offsetWidth,
-    height: workspace.offsetHeight,
-    top: workspace.style.top || '0px',
-    left: workspace.style.left || '0px'
+      width: workspace.offsetWidth,
+      height: workspace.offsetHeight,
+      top: workspace.style.top || '0px',
+      left: workspace.style.left || '0px',
   };
 
   return {
-    html: workSpaceHTML,
-    metadata: workspaceMetadata
+      html: workspaceHTML,
+      metadata: workspaceMetadata,
+      canvas: canvasState, // Include canvas data if a canvas exists
   };
 }
-
 
 const saveBoard = async (boardData) => {
   const result = await ipcRenderer.invoke('save-board', boardData);
@@ -275,7 +294,7 @@ if (openBtn) {
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     console.log("Save clicked");
-    let workspaceData = await grabWorkspace();
+    let workspaceData = await grabWorkspaceAndCanvas();
     saveBoard(workspaceData);
     settingsDropdown.style.display = "none";
   });
