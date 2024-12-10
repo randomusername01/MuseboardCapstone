@@ -1,5 +1,7 @@
 const { ipcRenderer } = require("electron");
 
+
+
 function convertImageToBase64(imagePath) {
   return new Promise((resolve, reject) => {
     // Check if the image is a GIF
@@ -83,6 +85,37 @@ function applySettings(settings) {
 
   ipcRenderer.send("toggle-launch-on-startup", settings.launchOnStart);
 }
+
+ipcRenderer.on('load-board-data', (e, boardData) => {
+  if (!boardData || !boardData.html) {
+    console.error("boardData or its 'html' attribute is undefined");
+    return;
+  }
+
+  // Clear the current workspace
+  clearContent();
+
+  // Parse the saved workspace HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = boardData.html;
+
+  const newWorkspace = tempDiv.firstChild;
+
+  if (newWorkspace) {
+    // Iterate through child elements of the workspace
+    const elements = newWorkspace.children;
+    Array.from(elements).forEach((element) => {
+      console.log("Element:", element);
+      if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'text') {
+        console.log("Found a textbox");
+        addText('HELLO WORLD');
+      }
+    }); // End the forEach loop
+  } else {
+    console.error("Parsed workspace is empty or invalid");
+  }
+});
+
 
 ipcRenderer.on("apply-settings", (e, settings) => {
   applySettings(settings);
@@ -214,22 +247,6 @@ if (openBtn) {
       // Trigger the main process to open a file dialog and select a .board file
       const result = await ipcRenderer.invoke('open-board-file');
       if (result && result.success) {
-        const boardData = result.boardData; // The parsed board data from the .board file
-
-        // Extract the workspace HTML and metadata
-        const { html, metadata } = boardData;
-
-        // Create a temporary div to parse the HTML and preserve the entire element structure
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-
-        // Find the workspace element within the loaded HTML
-        const newWorkspace = tempDiv.firstChild;
-
-        // Replace the entire workspace element with the new one
-        const workspace = document.querySelector('#workspace');
-        workspace.replaceWith(newWorkspace); // Replace the entire workspace element with the new one
-
         alert('Board loaded successfully!');
       } else {
         alert('Failed to open the board file.');

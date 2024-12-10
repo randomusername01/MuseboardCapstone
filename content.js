@@ -77,15 +77,15 @@ function stopDrawing() {
   ctx.closePath();
 }
 
-// Add Text to Workspace
-function addText() {
+// Add Text to Workspace with optional parameters for innerText, top, and left
+function addText(innerText = "Type your text here...", top = "100px", left = "100px") {
   const textBox = document.createElement("div");
   textBox.setAttribute("data-type", "text");
   textBox.contentEditable = true;
-  textBox.innerText = "Type your text here...";
+  textBox.innerText = innerText; // Use the optional innerText or the default value
   textBox.style.position = "absolute";
-  textBox.style.top = "100px";
-  textBox.style.left = "100px";
+  textBox.style.top = top; // Use the optional top position or the default value
+  textBox.style.left = left; // Use the optional left position or the default value
   textBox.style.fontSize = "1em";
   textBox.style.cursor = "move";
   workspace.appendChild(textBox);
@@ -278,7 +278,9 @@ function makeDraggable(element) {
 }
 
 drawBtn.addEventListener("click", enableDrawing);
-addTextBtn.addEventListener("click", addText);
+addTextBtn.addEventListener("click", () => {
+  addText(); // Call addText without passing the event
+});
 addImageBtn.addEventListener("click", addImage);
 addGifBtn.addEventListener("click", addGif);
 clearBtn.addEventListener("click", clearContent);

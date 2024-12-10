@@ -122,7 +122,7 @@ const setupIpcHandlers = () => {
       );
     }
   });
-  ipcMain.handle('open-board-file', async () => {
+  ipcMain.handle('open-board-file', async (e) => {
     try {
       // Open a dialog to select a .board file
       const result = await dialog.showOpenDialog({
@@ -138,7 +138,9 @@ const setupIpcHandlers = () => {
       const fileContent = fs.readFileSync(filePath, 'utf-8'); // Read the file content
       const boardData = JSON.parse(fileContent); // Parse the file (assuming JSON format)
   
-      return { success: true, boardData }; // Return the parsed data
+      // Sending data to renderer process
+      e.sender.send('load-board-data', boardData);
+      return { success: true };
     } catch (error) {
       console.error('Error opening board file:', error);
       return { success: false, error: error.message };
