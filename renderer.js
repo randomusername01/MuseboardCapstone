@@ -1,8 +1,38 @@
 const { ipcRenderer } = require("electron");
 
-// let workspace = document.getElementById('workspace');
+function convertImageToBase64(imagePath) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result); // result contains the base64 encoded string
+    reader.onerror = reject;
 
-function grabWorkspace() {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png')); // Returns base64 string in PNG format
+    };
+    img.src = imagePath;
+  });
+}
+
+async function grabWorkspace() {
+  // Get all image elements in the workspace
+  const images = document.querySelectorAll('#workspace img');
+  
+  // Replace image paths with base64 data
+  for (const img of images) {
+    const src = img.src;
+    if (src.startsWith('file://')) {
+      // Assuming it's a local file path, convert it to base64
+      const base64Src = await convertImageToBase64(src);
+      img.src = base64Src; // Replace the image's source with the base64 string
+    }
+  }
+
   // Serialize the entire workspace
   const workSpaceHTML = workspace.outerHTML;
 
@@ -17,8 +47,9 @@ function grabWorkspace() {
   return {
     html: workSpaceHTML,
     metadata: workspaceMetadata
-  }
+  };
 }
+
 
 const saveBoard = async (boardData) => {
   const result = await ipcRenderer.invoke('save-board', boardData);
@@ -163,9 +194,9 @@ const saveBtn = document.getElementById("saveBtn");
 const saveAsBtn = document.getElementById("saveAsBtn");
 
 if (saveBtn) {
-  saveBtn.addEventListener("click", () => {
+  saveBtn.addEventListener("click", async () => {
     console.log("Save clicked");
-    let workspaceData = grabWorkspace();
+    let workspaceData = await grabWorkspace();
     saveBoard(workspaceData);
     settingsDropdown.style.display = "none";
   });
