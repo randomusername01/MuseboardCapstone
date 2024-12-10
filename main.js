@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, screen, Menu, dialog } = require("electron");
 const path = require("path");
 const settings = require("electron-settings");
 const AutoLaunch = require("auto-launch");
@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS = {
 };
 
 let mainWindow;
-let modalWindow; // Declare the modalWindow variable outside the handler to keep track of it
+let modalWindow;
 
 // Initialize AutoLaunch
 const autoLauncher = new AutoLaunch({
@@ -137,4 +137,21 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+ipcMain.handle("select-file", async (event, fileType) => {
+  const filters = [
+    { name: "Images", extensions: ["jpg", "png", "jpeg"] },
+    { name: "GIFs", extensions: ["gif"] },
+  ];
+
+  const selectedFilter = fileType === "image" ? filters[0] : filters[1];
+
+  const result = await dialog.showOpenDialog({
+    properties: ["openFile"],
+    filters: [selectedFilter],
+  });
+
+  if (result.canceled) return null; // If the user canceled, return null
+  return result.filePaths[0]; // Return the first selected file path
 });
