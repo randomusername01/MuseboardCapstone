@@ -11,8 +11,13 @@ const addLinkBtn = document.getElementById("add-link-btn");
 const drawBtn = document.getElementById("draw-btn");
 const clearBtn = document.getElementById("clear-btn");
 
+// Modal Elements
+const linkModal = document.getElementById("link-modal");
+const linkInput = document.getElementById("link-input");
+const insertLinkBtn = document.getElementById("insert-link-btn");
+
 function resizeCanvas() {
-  const toolbarHeight = document.querySelector('.toolbar').offsetHeight || 0;
+  const toolbarHeight = document.querySelector(".toolbar").offsetHeight || 0;
   canvas.width = workspace.offsetWidth;
   canvas.height = workspace.offsetHeight - toolbarHeight;
   canvas.style.top = `${toolbarHeight}px`;
@@ -54,7 +59,6 @@ function getMousePosition(canvas, event) {
   };
 }
 
-
 function startDrawing(e) {
   const pos = getMousePosition(canvas, e);
   ctx.beginPath();
@@ -84,7 +88,6 @@ function addText() {
   textBox.style.position = "absolute";
   textBox.style.top = "100px";
   textBox.style.left = "100px";
-  textBox.style.color = "#2c3e50";
   textBox.style.fontSize = "1em";
   textBox.style.cursor = "move";
   workspace.appendChild(textBox);
@@ -135,24 +138,112 @@ function addGif() {
   });
 }
 
-// Add Link to Workspace
-function addLink() {
-  const linkUrl = prompt("Enter the link URL:");
-  if (!linkUrl) return;
+const { shell } = require("electron");
+
+// Create link 
+addLinkBtn.addEventListener("click", () => {
+  linkInput.value = ""; 
+  linkModal.style.display = "block";
+  linkBeingEdited = null; 
+});
+
+// Handle insert button 
+insertLinkBtn.addEventListener("click", () => {
+  const linkUrl = linkInput.value.trim();
+
+//validate url
+  const validLinkUrl =
+    linkUrl.startsWith("http://") || linkUrl.startsWith("https://")
+      ? linkUrl
+      : `https://${linkUrl}`;
+
+  if (!validLinkUrl) {
+    alert("Please enter a valid link.");
+    return;
+  }
+
+  if (linkBeingEdited) {
+    linkBeingEdited.href = validLinkUrl;
+    linkBeingEdited.innerText = validLinkUrl;
+    linkBeingEdited = null; 
+  } else {
+    createLinkElement(validLinkUrl, "250px", "250px");
+  }
+
+  linkModal.style.display = "none"; 
+});
+
+// Create link element
+function createLinkElement(linkUrl, top, left) {
+  const linkWrapper = document.createElement("div");
+  linkWrapper.style.position = "absolute";
+  linkWrapper.style.top = top;
+  linkWrapper.style.left = left;
+  linkWrapper.style.paddingRight = "10px"; 
+  linkWrapper.style.display = "inline-block";
+
   const link = document.createElement("a");
   link.href = linkUrl;
-  link.innerText = "Click Me";
-  link.target = "_blank";
-  link.style.position = "absolute";
-  link.style.top = "250px";
-  link.style.left = "250px";
+  link.innerText = linkUrl;
   link.style.color = "#2980b9";
   link.style.fontSize = "1em";
-  link.style.cursor = "move";
-  workspace.appendChild(link);
+  link.style.cursor = "pointer";
+  link.target = "_blank";
+
+  // Open link in default browser
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    shell.openExternal(link.href);
+  });
+
+  // Create edit button
+  const editLinkBtn = document.createElement("button");
+  editLinkBtn.className = "edit-link-btn";
+  editLinkBtn.style.position = "absolute";
+  editLinkBtn.style.right = "-15px"; 
+  editLinkBtn.style.top = "50%";
+  editLinkBtn.style.transform = "translateY(-50%)";
+  editLinkBtn.style.width = "20px"; 
+  editLinkBtn.style.height = "20px";
+  editLinkBtn.style.background = "#bdc3c7"; 
+  editLinkBtn.style.border = "none";
+  editLinkBtn.style.borderRadius = "4px"; 
+  editLinkBtn.style.cursor = "pointer";
+  editLinkBtn.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
+  editLinkBtn.style.justifyContent = "center";
+  editLinkBtn.style.alignItems = "center";
+  editLinkBtn.style.display = "none"; 
+  editLinkBtn.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="14px" height="14px">
+      <path d="M14.69,2.92,20.07,8.3a1,1,0,0,1,0,1.41l-9.9,9.9a1,1,0,0,1-.32.22L5.38,21.82a1,1,0,0,1-1.28-1.28l1.39-4.47a1,1,0,0,1,.22-.32l9.9-9.9A1,1,0,0,1,14.69,2.92ZM6.47,17.53l2,2,6.34-6.34-2-2Z"/>
+    </svg>
+  `;
+
+  linkWrapper.addEventListener("mouseenter", () => {
+    editLinkBtn.style.display = "flex";
+  });
+
+  linkWrapper.addEventListener("mouseleave", () => {
+    editLinkBtn.style.display = "none";
+  });
+
+  // Handle edit button click
+  editLinkBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    linkInput.value = link.href; 
+    linkModal.style.display = "block"; 
+    linkBeingEdited = link; 
+  });
+
+  
+  linkWrapper.appendChild(link);
+  linkWrapper.appendChild(editLinkBtn); 
+
+  // Add link ot canvas
+  workspace.appendChild(linkWrapper);
 
   // Enable dragging
-  makeDraggable(link);
+  makeDraggable(linkWrapper);
 }
 
 // Clear Workspace
@@ -161,15 +252,13 @@ function clearContent() {
   workspace.innerHTML = ""; // Removes all added elements
 }
 
-
 // Make Element Draggable
 function makeDraggable(element) {
   let isDragging = false;
-  let offsetX, offsetY;
+  let startX, startY, elementX, elementY;
 
   element.addEventListener("mousedown", (e) => {
     isDragging = true;
-    // Recording the initial mouse position and the current position of the element
     startX = e.pageX;
     startY = e.pageY;
     elementX = parseInt(element.style.left || 0, 10);
@@ -178,7 +267,6 @@ function makeDraggable(element) {
 
   document.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
-    // Calculating new position of element based on the difference from the starting mouse position
     const deltaX = e.pageX - startX;
     const deltaY = e.pageY - startY;
     element.style.left = `${elementX + deltaX}px`;
@@ -194,5 +282,4 @@ drawBtn.addEventListener("click", enableDrawing);
 addTextBtn.addEventListener("click", addText);
 addImageBtn.addEventListener("click", addImage);
 addGifBtn.addEventListener("click", addGif);
-addLinkBtn.addEventListener("click", addLink);
 clearBtn.addEventListener("click", clearContent);
