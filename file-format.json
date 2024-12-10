@@ -1,0 +1,31 @@
+{
+    "board": {
+        "name": "Example Board",
+        "elements": [
+            {
+                "type": "text",
+                "id": "text1",
+                "content": "Hello World",
+                "position": { "x": 100, "y": 150 }
+            },
+            {
+                "type": "image",
+                "id": "image1",
+                "src": "data:image/png;base64,...",
+                "position": { "x": 200, "y": 300 }
+            },
+            {
+                "type": "gif",
+                "id": "gif1",
+                "src": "data:image/gif;base64,...",
+                "position": { "x": 500, "y": 400 }
+            },
+            {
+                "type": "link",
+                "id": "link1",
+                "url": "https://google.com",
+                "position": { "x": 600, "y": 200 }
+            }
+        ]
+    }
+}
