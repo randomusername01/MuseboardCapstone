@@ -118,6 +118,11 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
       else if (element.tagName.toLowerCase() === 'img' && /^data:image\/gif;base64,/.test(element.getAttribute('src'))) {
         addGif(element.getAttribute('src'), element.style.top, element.style.left);
       }
+      // Adding link
+      else if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'link') {
+        const anchor = element.querySelector('a');
+        createLinkElement(anchor.href, element.style.top, element.style.left);
+      }
     });
   } else {
     console.error("Parsed workspace is empty or invalid");
