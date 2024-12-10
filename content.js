@@ -16,6 +16,78 @@ const linkModal = document.getElementById("link-modal");
 const linkInput = document.getElementById("link-input");
 const insertLinkBtn = document.getElementById("insert-link-btn");
 
+const saveBoard = async (boardData) => {
+  const result = await ipcRenderer.invoke('save-board', boardData);
+  if (result.success) {
+    alert(`Board saved to ${result.filePath}`);
+  } else {
+    alert(`Failed to save board: ${result.error}`);
+  }
+}
+
+function analyzeWorkspaceElements() {
+  const elements = workspace.children;
+  const elementData = [];
+
+  Array.from(elements).forEach((element) => {
+    if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'text') {
+      const type = 'text';
+      let content = element.innerText;
+      let position = {
+        top: element.style.top || '0px',
+        left: element.style.left || '0px'
+      };
+      elementData.push({
+        type,
+        content,
+        position
+      });
+    }
+    else if (element.tagName.toLowerCase() === 'img' && !element.src.toLowerCase().endsWith('.gif')) {
+      const type = 'image';
+      let src = element.src;
+      let position = {
+        top: element.style.top || '0px',
+        left: element.style.left || '0px'
+      };
+      elementData.push({
+        type,
+        src,
+        position
+      });
+    }
+    else if (element.tagName.toLowerCase() === 'img' && element.src.toLowerCase().endsWith('.gif')) {
+      const type = 'gif';
+      let src = element.src;
+      let position = {
+        top: element.style.top || '0px',
+        left: element.style.left || '0px'
+      };
+      elementData.push({
+        type,
+        src,
+        position
+      });
+    }
+    else if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'link') {
+      const type = 'link';
+      let anchorTag = element.querySelector('a');
+      let url = anchorTag ? anchorTag.href : null;
+      let position = {
+        top: element.style.top || '0px',
+        left: element.style.left || '0px'
+      };
+      elementData.push({
+        type,
+        url,
+        position
+      })
+    }
+  });
+
+  return elementData;
+}
+
 function resizeCanvas() {
   const toolbarHeight = document.querySelector(".toolbar").offsetHeight || 0;
   canvas.width = workspace.offsetWidth;
@@ -80,6 +152,7 @@ function stopDrawing() {
 // Add Text to Workspace
 function addText() {
   const textBox = document.createElement("div");
+  textBox.setAttribute("data-type", "text");
   textBox.contentEditable = true;
   textBox.innerText = "Type your text here...";
   textBox.style.position = "absolute";
@@ -173,6 +246,7 @@ insertLinkBtn.addEventListener("click", () => {
 // Create link element
 function createLinkElement(linkUrl, top, left) {
   const linkWrapper = document.createElement("div");
+  linkWrapper.setAttribute("data-type", "link");
   linkWrapper.style.position = "absolute";
   linkWrapper.style.top = top;
   linkWrapper.style.left = left;

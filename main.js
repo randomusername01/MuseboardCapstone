@@ -1,7 +1,12 @@
 const { app, BrowserWindow, ipcMain, screen, Menu, dialog } = require("electron");
 const path = require("path");
+const fs = require('fs');
 const settings = require("electron-settings");
 const AutoLaunch = require("auto-launch");
+
+// Enable remote debugging (e.g., on port 9222)
+app.commandLine.appendSwitch('remote-debugging-port', '8315');
+app.commandLine.appendSwitch('remote-allow-origins', '*');
 
 const ICON_PATH = path.join(__dirname, "assets/icons/museboard-icon.png");
 const AUTO_LAUNCH_NAME = "MuseBoard";
@@ -115,6 +120,24 @@ const setupIpcHandlers = () => {
         newPrimaryColor,
         newSecondaryColor
       );
+    }
+  });
+  ipcMain.handle('save-board', async (e, data) => {
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      filters: [
+        { name: "MuseBoard Files", extensions: ['board'] }
+      ],
+      defaultPath: 'board1.board'
+    });
+
+    if (canceled || !filePath) return { success:false };
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+      return { success: true, filePath };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
     }
   });
 };
