@@ -42,15 +42,17 @@ function enableDrawing() {
     canvas.style.pointerEvents = "none";
   }
 }
+
 function getMousePosition(canvas, event) {
   const rect = canvas.getBoundingClientRect();
-  const offsetFix = 18;
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
   return {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top - offsetFix,
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY,
   };
 }
-
 
 
 function startDrawing(e) {
