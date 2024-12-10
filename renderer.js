@@ -2,22 +2,36 @@ const { ipcRenderer } = require("electron");
 
 function convertImageToBase64(imagePath) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result); // result contains the base64 encoded string
-    reader.onerror = reject;
+    // Check if the image is a GIF
+    if (imagePath.toLowerCase().endsWith('.gif')) {
+      fetch(imagePath)
+        .then(response => response.blob()) // Fetch the image as a Blob
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result); // result contains the base64 encoded string
+          reader.onerror = reject;
+          reader.readAsDataURL(blob); // Read image Blob as base64 string
+        })
+        .catch(reject); // Handle fetch errors
+    } else {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result); // result contains the base64 encoded string
+      reader.onerror = reject;
 
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL('image/png')); // Returns base64 string in PNG format
-    };
-    img.src = imagePath;
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png')); // Returns base64 string in PNG format
+      };
+      img.src = imagePath;
+    }
   });
 }
+
 
 async function grabWorkspace() {
   // Get all image elements in the workspace
