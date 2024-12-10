@@ -85,7 +85,6 @@ function addText() {
   textBox.style.position = "absolute";
   textBox.style.top = "100px";
   textBox.style.left = "100px";
-  textBox.style.color = "#2c3e50";
   textBox.style.fontSize = "1em";
   textBox.style.cursor = "move";
   workspace.appendChild(textBox);
