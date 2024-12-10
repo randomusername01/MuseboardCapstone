@@ -105,12 +105,16 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
     // Iterate through child elements of the workspace
     const elements = newWorkspace.children;
     Array.from(elements).forEach((element) => {
-      console.log("Element:", element);
+      console.log(element);
+      // Adding text
       if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'text') {
-        console.log("Found a textbox");
-        addText('HELLO WORLD');
+        addText(element.innerText, element.style.top, element.style.left);
       }
-    }); // End the forEach loop
+      // Adding image
+      else if (element.tagName.toLowerCase() === 'img' && /^data:image\/png;base64,/.test(element.getAttribute('src'))) {
+        addImage(element.getAttribute('src'), element.style.top, element.style.left);
+      }
+    });
   } else {
     console.error("Parsed workspace is empty or invalid");
   }
@@ -247,7 +251,7 @@ if (openBtn) {
       // Trigger the main process to open a file dialog and select a .board file
       const result = await ipcRenderer.invoke('open-board-file');
       if (result && result.success) {
-        alert('Board loaded successfully!');
+        console.log("Board loaded successfully");
       } else {
         alert('Failed to open the board file.');
       }

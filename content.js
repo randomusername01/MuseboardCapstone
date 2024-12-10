@@ -95,45 +95,43 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
 }
 
 // Add Image to Workspace
-function addImage() {
-  ipcRenderer.invoke("select-file", "image").then((filePath) => {
-    if (!filePath) return;
+function addImage(filePath = null, top = "150px", left = "150px") {
+  // If filePath is not provided, prompt the user to select a file
+  if (!filePath) {
+    ipcRenderer.invoke("select-file", "image").then((selectedFilePath) => {
+      if (!selectedFilePath) return;
 
+      // Create image element and set properties
+      const img = document.createElement("img");
+      img.src = selectedFilePath;
+      img.style.position = "absolute";
+      img.style.top = top;
+      img.style.left = left;
+      img.style.maxWidth = "200px";
+      img.style.border = "1px solid #ddd";
+      img.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.3)";
+      img.style.cursor = "move";
+      workspace.appendChild(img);
+
+      // Enable dragging functionality
+      makeDraggable(img);
+    });
+  } else {
+    // Create image element with provided file path
     const img = document.createElement("img");
     img.src = filePath;
     img.style.position = "absolute";
-    img.style.top = "150px";
-    img.style.left = "150px";
+    img.style.top = top;
+    img.style.left = left;
     img.style.maxWidth = "200px";
     img.style.border = "1px solid #ddd";
     img.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.3)";
     img.style.cursor = "move";
     workspace.appendChild(img);
 
-    // Enable dragging
+    // Enable dragging functionality
     makeDraggable(img);
-  });
-}
-
-// Add GIF to Workspace
-function addGif() {
-  ipcRenderer.invoke("select-file", "gif").then((filePath) => {
-    if (!filePath) return;
-
-    const gif = document.createElement("img");
-    gif.src = filePath;
-    gif.style.position = "absolute";
-    gif.style.top = "200px";
-    gif.style.left = "200px";
-    gif.style.maxWidth = "200px";
-    gif.style.border = "1px solid #ddd";
-    gif.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.3)";
-    gif.style.cursor = "move";
-    workspace.appendChild(gif);
-
-    // Enable dragging
-    makeDraggable(gif);
-  });
+  }
 }
 
 const { shell } = require("electron");
@@ -281,6 +279,10 @@ drawBtn.addEventListener("click", enableDrawing);
 addTextBtn.addEventListener("click", () => {
   addText(); // Call addText without passing the event
 });
-addImageBtn.addEventListener("click", addImage);
-addGifBtn.addEventListener("click", addGif);
+addImageBtn.addEventListener("click", () => {
+  addImage(); // Call addImage without passing the event
+});
+addGifBtn.addEventListener("click", () => {
+  addGif(); // Call addGif without passing the event
+});
 clearBtn.addEventListener("click", clearContent);
