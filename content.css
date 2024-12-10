@@ -25,6 +25,13 @@
     background: transparent;
 }
 
+.toolbar-btn.active {
+    background-color: #162935;
+    color: white;
+    border: 1px solid #03070a;
+  }
+  
+
 /* Workspace */
 #workspace {
     position: absolute;
