@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, screen, Menu, dialog } = require("electron");
 const path = require("path");
+const fs = require('fs');
 const settings = require("electron-settings");
 const AutoLaunch = require("auto-launch");
 
@@ -8,19 +9,16 @@ const AUTO_LAUNCH_NAME = "MuseBoard";
 const DEFAULT_SETTINGS = {
   launchOnStart: false,
   darkMode: false,
-  autoSave: false,
 };
 
 let mainWindow;
 let modalWindow;
 
-// Initialize AutoLaunch
 const autoLauncher = new AutoLaunch({
   name: AUTO_LAUNCH_NAME,
   path: app.getPath("exe"),
 });
 
-// Set default settings if not already set
 const setDefaultSettings = () => {
   Object.entries(DEFAULT_SETTINGS).forEach(([key, value]) => {
     if (!settings.hasSync(key)) {
@@ -29,13 +27,11 @@ const setDefaultSettings = () => {
   });
 };
 
-// Auto-launch enable/disable function
 const setAutoLaunch = (enabled) => {
   enabled ? autoLauncher.enable() : autoLauncher.disable();
   console.log(`AUTO LAUNCH ${enabled ? "ENABLED" : "DISABLED"}`);
 };
 
-// Create main window
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const panelWidth = Math.floor(width / 3) - 40;
@@ -59,13 +55,12 @@ async function createWindow() {
 
   mainWindow.loadFile("index.html");
 
-  // Send settings to renderer after window is loaded
   mainWindow.webContents.on("did-finish-load", () => {
     mainWindow.webContents.send("apply-settings", currentSettings);
   });
 
   ipcMain.on("open-theme-customizer", () => {
-    // Create the modal window
+    
     modalWindow = new BrowserWindow({
       parent: mainWindow,
       modal: true,
@@ -80,15 +75,15 @@ async function createWindow() {
 
     modalWindow.loadFile("theme-customizer.html");
 
-    // Handle the close window event for modal window
+   
     ipcMain.once("close-window", () => {
       if (modalWindow) {
-        modalWindow.close(); // Close modal window
+        modalWindow.close();
       }
     });
   });
 
-  // Handle panel toggle
+  
   ipcMain.on("toggle-panel", (event, isVisible) => {
     mainWindow.setBounds({
       x: isVisible ? width - panelWidth - 60 : width - 60,
@@ -98,7 +93,6 @@ async function createWindow() {
   });
 }
 
-// IPC Handlers
 const setupIpcHandlers = () => {
   ipcMain.handle("get-settings", async () => await settings.get());
   ipcMain.handle("save-setting", async (e, key, value) => {
@@ -117,9 +111,49 @@ const setupIpcHandlers = () => {
       );
     }
   });
+  ipcMain.handle('open-board-file', async (e) => {
+    try {
+      const result = await dialog.showOpenDialog({
+        filters: [{ name: 'Board Files', extensions: ['board'] }],
+        properties: ['openFile']
+      });
+  
+      if (result.canceled || result.filePaths.length === 0) {
+        return { success: false };
+      }
+  
+      const filePath = result.filePaths[0];
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const boardData = JSON.parse(fileContent);
+  
+      
+      e.sender.send('load-board-data', boardData);
+      return { success: true };
+    } catch (error) {
+      console.error('Error opening board file:', error);
+      return { success: false, error: error.message };
+    }
+  });
+  ipcMain.handle('save-board', async (e, data) => {
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      filters: [
+        { name: "MuseBoard Files", extensions: ['board'] }
+      ],
+      defaultPath: 'board1.board'
+    });
+
+    if (canceled || !filePath) return { success:false };
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+      return { success: true, filePath };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error };
+    }
+  });
 };
 
-// Electron App Lifecycle
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
   setDefaultSettings();
@@ -152,6 +186,6 @@ ipcMain.handle("select-file", async (event, fileType) => {
     filters: [selectedFilter],
   });
 
-  if (result.canceled) return null; // If the user canceled, return null
-  return result.filePaths[0]; // Return the first selected file path
+  if (result.canceled) return null;
+  return result.filePaths[0];
 });
