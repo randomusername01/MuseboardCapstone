@@ -201,6 +201,7 @@ input:checked + .slider:before {
     height: 100%;
     background: transparent;
     z-index: 1;
+    pointer-events: none;
 }
 
 #workspace {

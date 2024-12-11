@@ -233,13 +233,10 @@ const toggleAutoSave = document.getElementById("toggleAutoSave");
 
 let isPanelVisible = false;
 
-// toggleButton.innerHTML = isPanelVisible ? "→" : "←";
-
 loadSettings().then((settings) => {
   if (settings) {
     toggleLaunchStart.checked = settings.launchOnStart || false;
     toggleDarkMode.checked = settings.darkMode || false;
-    toggleAutoSave.checked = settings.autoSave || false;
   }
 });
 
@@ -302,10 +299,6 @@ window.addEventListener("load", () => {
 
 toggleDarkMode.addEventListener("change", (e) => {
   saveSetting("darkMode", e.target.checked);
-});
-
-toggleAutoSave.addEventListener("change", (e) => {
-  saveSetting("autoSave", e.target.checked);
 });
 
 const openBtn = document.getElementById("openBtn");
