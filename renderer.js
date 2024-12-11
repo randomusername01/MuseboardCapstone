@@ -55,11 +55,9 @@ const toggleAutoSave = document.getElementById("toggleAutoSave");
 
 let isPanelVisible = false;
 
-toggleButton.innerHTML = isPanelVisible ? "→" : "←";
+// toggleButton.innerHTML = isPanelVisible ? "→" : "←";
 
-// Loading settings and initializing the UI
 loadSettings().then((settings) => {
-  // Initializing UI elements based on the saved settings
   if (settings) {
     toggleLaunchStart.checked = settings.launchOnStart || false;
     toggleDarkMode.checked = settings.darkMode || false;
@@ -70,16 +68,18 @@ loadSettings().then((settings) => {
 function togglePanel() {
   isPanelVisible = !isPanelVisible;
 
+  const icon = toggleButton.querySelector("i");
   if (isPanelVisible) {
     panel.classList.add("visible");
-    toggleButton.innerHTML = "→";
+    icon.classList.replace("fa-square-caret-left", "fa-square-caret-right");
   } else {
     panel.classList.remove("visible");
-    toggleButton.innerHTML = "←";
+    icon.classList.replace("fa-square-caret-right", "fa-square-caret-left");
   }
 
   ipcRenderer.send("toggle-panel", isPanelVisible);
 }
+
 
 toggleButton.addEventListener("click", togglePanel);
 
