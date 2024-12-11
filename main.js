@@ -4,16 +4,11 @@ const fs = require('fs');
 const settings = require("electron-settings");
 const AutoLaunch = require("auto-launch");
 
-// Enable remote debugging (e.g., on port 9222)
-app.commandLine.appendSwitch('remote-debugging-port', '8315');
-app.commandLine.appendSwitch('remote-allow-origins', '*');
-
 const ICON_PATH = path.join(__dirname, "assets/icons/museboard-icon.png");
 const AUTO_LAUNCH_NAME = "MuseBoard";
 const DEFAULT_SETTINGS = {
   launchOnStart: false,
   darkMode: false,
-  autoSave: false,
 };
 
 let mainWindow;

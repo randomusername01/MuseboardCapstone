@@ -10,7 +10,7 @@ function convertImageToBase64(imagePath) {
         .then(response => response.blob()) // Fetch the image as a Blob
         .then(blob => {
           const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result); // result contains the base64 encoded string
+          reader.onloadend = () => resolve(reader.result);
           reader.onerror = reject;
           reader.readAsDataURL(blob); // Read image Blob as base64 string
         })
@@ -27,7 +27,7 @@ function convertImageToBase64(imagePath) {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL('image/png')); // Returns base64 string in PNG format
+        resolve(canvas.toDataURL('image/png'));
       };
       img.src = imagePath;
     }
@@ -45,7 +45,8 @@ async function grabWorkspaceAndCanvas() {
       if (src.startsWith('file://')) {
           // Assuming it's a local file path, convert it to base64
           const base64Src = await convertImageToBase64(src);
-          img.src = base64Src; // Replace the image's source with the base64 string
+           // Replace the image's source with the base64 string
+          img.src = base64Src;
       }
   }
 
@@ -173,9 +174,11 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
 
         // Replace the existing canvas with the new canvas
         if (existingCanvas) {
-          contentArea.replaceChild(newCanvas, existingCanvas); // Replace the existing canvas
+          // Replace the existing canvas
+          contentArea.replaceChild(newCanvas, existingCanvas);
         } else {
-          contentArea.appendChild(newCanvas); // Append if no canvas exists
+          // Append if no canvas exists
+          contentArea.appendChild(newCanvas);
         }
       }
     } else {
@@ -203,7 +206,7 @@ ipcRenderer.on(
   }
 );
 
-// Load settings from the main process (ensure you get the latest settings from the settings.json file)
+// Load settings from the main process
 async function loadSettings() {
   const settings = await ipcRenderer.invoke("get-settings");
   console.log("Loaded settings:", settings);
@@ -312,7 +315,6 @@ const saveAsBtn = document.getElementById("saveAsBtn");
 if (openBtn) {
   openBtn.addEventListener("click", async () => {
     try {
-      // Trigger the main process to open a file dialog and select a .board file
       const result = await ipcRenderer.invoke('open-board-file');
       if (result && result.success) {
         console.log("Board loaded successfully");

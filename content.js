@@ -82,10 +82,10 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
   const textBox = document.createElement("div");
   textBox.setAttribute("data-type", "text");
   textBox.contentEditable = true;
-  textBox.innerText = innerText; // Use the optional innerText or the default value
+  textBox.innerText = innerText;
   textBox.style.position = "absolute";
-  textBox.style.top = top; // Use the optional top position or the default value
-  textBox.style.left = left; // Use the optional left position or the default value
+  textBox.style.top = top;
+  textBox.style.left = left;
   textBox.style.fontSize = "1em";
   textBox.style.cursor = "move";
   workspace.appendChild(textBox);
@@ -143,10 +143,10 @@ function addGif(src = null, top = "200px", left = "200px") {
 
       // Create GIF element and set properties
       const gif = document.createElement("img");
-      gif.src = selectedFilePath;  // Set the src to the selected file path
+      gif.src = selectedFilePath;
       gif.style.position = "absolute";
-      gif.style.top = top;  // Set the top position to the provided or default value
-      gif.style.left = left;  // Set the left position to the provided or default value
+      gif.style.top = top;
+      gif.style.left = left;
       gif.style.maxWidth = "200px";
       gif.style.cursor = "move";
       workspace.appendChild(gif);
@@ -157,10 +157,10 @@ function addGif(src = null, top = "200px", left = "200px") {
   } else {
     // Create GIF element with provided src
     const gif = document.createElement("img");
-    gif.src = src;  // Set the src to the provided or selected URL
+    gif.src = src;
     gif.style.position = "absolute";
-    gif.style.top = top;  // Set the top position to the provided or default value
-    gif.style.left = left;  // Set the left position to the provided or default value
+    gif.style.top = top;  
+    gif.style.left = left;  
     gif.style.maxWidth = "200px";
     gif.style.cursor = "move";
     workspace.appendChild(gif);
@@ -313,12 +313,12 @@ function makeDraggable(element) {
 
 drawBtn.addEventListener("click", enableDrawing);
 addTextBtn.addEventListener("click", () => {
-  addText(); // Call addText without passing the event
+  addText();
 });
 addImageBtn.addEventListener("click", () => {
-  addImage(); // Call addImage without passing the event
+  addImage();
 });
 addGifBtn.addEventListener("click", () => {
-  addGif(); // Call addGif without passing the event
+  addGif();
 });
 clearBtn.addEventListener("click", clearContent);
