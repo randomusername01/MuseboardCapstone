@@ -1,13 +1,14 @@
 {
-  "name": "Museboard",
-  "productName": "Museboard",
-  "description": "My Electron application description",
+  "name": "MuseBoard",
+  "productName": "MuseBoard",
+  "description": "Your creative hub for notes and visuals",
   "keywords": [],
   "main": "./main.js",
   "version": "1.0.0",
   "author": "benmolloy",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "dependencies": {
     "auto-launch": "6.0.0-rc1",
@@ -15,10 +16,35 @@
     "electron-settings": "4.0.4",
     "electron-store": "10.0.0",
     "fix-esm": "1.0.1",
-    "electron-builder": "26.0.0-alpha.7",
     "nodemon": "3.1.7"
   },
   "devDependencies": {
-    "electron": "33.2.1"
+    "electron": "33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "win": {
+    "target": "nsis",
+    "icon": "builds/icons/museboard-icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  },
+  "mac": {
+    "target": "dmg",
+    "icon": "builds/icons/museboard-icon.icns"
+  },
+  "linux": {
+    "target": "AppImage",
+    "icon": "builds/icons/museboard-icon.png"
+  },
+  "appId": "com.museboard.app",
+  "productName": "MuseBoard",
+  "directories": {
+    "output": "dist"
+  }
   }
 }
