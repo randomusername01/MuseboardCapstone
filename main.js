@@ -60,7 +60,7 @@ async function createWindow() {
   });
 
   ipcMain.on("open-theme-customizer", () => {
-    
+
     modalWindow = new BrowserWindow({
       parent: mainWindow,
       modal: true,
@@ -75,7 +75,7 @@ async function createWindow() {
 
     modalWindow.loadFile("theme-customizer.html");
 
-   
+
     ipcMain.once("close-window", () => {
       if (modalWindow) {
         modalWindow.close();
@@ -83,7 +83,7 @@ async function createWindow() {
     });
   });
 
-  
+
   ipcMain.on("toggle-panel", (event, isVisible) => {
     mainWindow.setBounds({
       x: isVisible ? width - panelWidth - 60 : width - 60,
@@ -117,16 +117,16 @@ const setupIpcHandlers = () => {
         filters: [{ name: 'Board Files', extensions: ['board'] }],
         properties: ['openFile']
       });
-  
+
       if (result.canceled || result.filePaths.length === 0) {
         return { success: false };
       }
-  
+
       const filePath = result.filePaths[0];
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       const boardData = JSON.parse(fileContent);
-  
-      
+
+
       e.sender.send('load-board-data', boardData);
       return { success: true };
     } catch (error) {
@@ -142,7 +142,7 @@ const setupIpcHandlers = () => {
       defaultPath: 'board1.board'
     });
 
-    if (canceled || !filePath) return { success:false };
+    if (canceled || !filePath) return { success: false };
 
     try {
       fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');

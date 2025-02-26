@@ -41,13 +41,13 @@ async function grabWorkspaceAndCanvas() {
 
   // Replace image paths with base64 data
   for (const img of images) {
-      const src = img.src;
-      if (src.startsWith('file://')) {
-          // Assuming it's a local file path, convert it to base64
-          const base64Src = await convertImageToBase64(src);
-           // Replace the image's source with the base64 string
-          img.src = base64Src;
-      }
+    const src = img.src;
+    if (src.startsWith('file://')) {
+      // Assuming it's a local file path, convert it to base64
+      const base64Src = await convertImageToBase64(src);
+      // Replace the image's source with the base64 string
+      img.src = base64Src;
+    }
   }
 
   // Get the canvas element in the workspace
@@ -55,18 +55,18 @@ async function grabWorkspaceAndCanvas() {
   let canvasState = null;
 
   if (canvas) {
-      // Capture the drawing data and attributes of the canvas
-      const drawingData = canvas.toDataURL(); // Get base64 data for canvas drawing
-      const canvasAttributes = {};
-      for (const attr of canvas.attributes) {
-        canvasAttributes[attr.name] = attr.value;
+    // Capture the drawing data and attributes of the canvas
+    const drawingData = canvas.toDataURL(); // Get base64 data for canvas drawing
+    const canvasAttributes = {};
+    for (const attr of canvas.attributes) {
+      canvasAttributes[attr.name] = attr.value;
     }
 
-      // Store the canvas data and attributes
-      canvasState = {
-          drawingData,
-          canvasAttributes,
-      };
+    // Store the canvas data and attributes
+    canvasState = {
+      drawingData,
+      canvasAttributes,
+    };
   }
 
   // Serialize the entire workspace HTML
@@ -74,16 +74,16 @@ async function grabWorkspaceAndCanvas() {
 
   // Get workspace dimensions and position
   const workspaceMetadata = {
-      width: workspace.offsetWidth,
-      height: workspace.offsetHeight,
-      top: workspace.style.top || '0px',
-      left: workspace.style.left || '0px',
+    width: workspace.offsetWidth,
+    height: workspace.offsetHeight,
+    top: workspace.style.top || '0px',
+    left: workspace.style.left || '0px',
   };
 
   return {
-      html: workspaceHTML,
-      metadata: workspaceMetadata,
-      canvasState: canvasState,
+    html: workspaceHTML,
+    metadata: workspaceMetadata,
+    canvasState: canvasState,
   };
 }
 
@@ -151,35 +151,33 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
     console.log(storedCanvas.canvasAttributes);
 
     if (storedCanvas) {
-      // Locate the div.content-area and replace its canvas
       const contentArea = document.querySelector('#content-area');
       if (contentArea) {
         const existingCanvas = contentArea.querySelector('canvas');
 
-        // Create a new canvas and copy attributes from the saved canvas
+        // Create a new canvas
         const newCanvas = document.createElement('canvas');
         for (const [name, value] of Object.entries(storedCanvas.canvasAttributes)) {
           newCanvas.setAttribute(name, value);
         }
 
+        newCanvas.id = "drawing-canvas";
+
         // Restore the drawing data on the new canvas
         const ctx = newCanvas.getContext('2d');
         const img = new Image();
-        console.log(storedCanvas.canvasState);
         img.src = boardData.canvasState.drawingData;
-        console.log(img.src);
         img.onload = () => {
           ctx.drawImage(img, 0, 0);
         };
 
-        // Replace the existing canvas with the new canvas
         if (existingCanvas) {
-          // Replace the existing canvas
           contentArea.replaceChild(newCanvas, existingCanvas);
         } else {
-          // Append if no canvas exists
           contentArea.appendChild(newCanvas);
         }
+
+        window.reinitCanvas();
       }
     } else {
       console.error("Parsed workspace is empty or invalid");
