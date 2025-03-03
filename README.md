@@ -53,7 +53,7 @@ Traditional note-taking apps often lack the flexibility to include visual elemen
 #### Development Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/Museboard.git
+   git clone https://github.com/randomusername01/MuseboardCapstone.git
    ```
 2. Navigate to the project directory:
    ```bash
