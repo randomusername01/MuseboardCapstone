@@ -42,7 +42,7 @@ Traditional note-taking apps often lack the flexibility to include visual elemen
 ## **Getting Started**
 
 ### For End Users
-1. Download the latest version of MuseBoard from the [Releases](https://github.com/Cjking57893/Museboard/releases) section on GitHub.
+1. Download the latest version of MuseBoard from the [Releases](https://github.com/randomusername01/MuseboardCapstone/releases) section on GitHub.
 2. Run the `.exe` installer and follow the on-screen instructions to install MuseBoard.
 3. Launch the application from your desktop or start menu.
 
