@@ -1,7 +1,5 @@
 const { ipcRenderer } = require("electron");
 
-
-
 function convertImageToBase64(imagePath) {
   return new Promise((resolve, reject) => {
     // Check if the image is a GIF
