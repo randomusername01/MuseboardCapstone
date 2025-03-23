@@ -49,6 +49,7 @@
 /* Toolbar Section */
 .toolbar {
     display: flex;
+    position: relative;
     justify-content: space-around;
     align-items: center;
     padding: 5px;
@@ -187,3 +188,31 @@
 .edit-link-btn:hover {
   background: #95a5a6;
 }
+
+.tool-option.selected {
+    background-color: #007bff;
+    color: white;
+  }
+  #drawing-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 4;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    padding: 10px;
+    display: none;
+  }
+  #drawing-options-dropdown label {
+    color: #34495E;
+  }  
+  .close-dropdown {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+  }  

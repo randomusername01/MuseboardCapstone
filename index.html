@@ -65,6 +65,21 @@
             <i class="fas fa-pencil-alt"></i>
             <span>Draw</span>
           </button>
+          <div id="drawing-options-dropdown" style="display: none;">
+            <label for="color-picker">Color:</label>
+            <input type="color" id="color-picker" value="#34495e">
+            
+            <label for="line-width">Thickness:</label>
+            <input type="range" id="line-width" min="1" max="10" value="2">
+            
+            <div id="drawing-tools">
+              <button class="tool-option" data-tool="pen">Pen</button>
+              <button class="tool-option" data-tool="pencil">Pencil</button>
+              <button class="tool-option" data-tool="highlighter">Highlighter</button>
+              <button class="tool-option" data-tool="brush">Brush</button>
+            </div>
+            <button id="close-drawing-options" class="close-dropdown">X</button>
+          </div>
           <button class="toolbar-btn" id="clear-btn">
             <i class="fas fa-eraser"></i>
             <span>Clear</span>
@@ -74,8 +89,8 @@
             <span>Undo</span>
           </button>
 
-          <input type="color" id="color-picker" value="#34495e">
-          <input type="range" id="line-width" min="1" max="10" value="2">
+          <!-- <input type="color" id="color-picker" value="#34495e">
+          <input type="range" id="line-width" min="1" max="10" value="2"> -->
         </div>
 
         <div id="workspace">

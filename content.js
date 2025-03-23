@@ -13,6 +13,11 @@ const undoBtn = document.getElementById("undo-btn");
 const linkModal = document.getElementById("link-modal");
 const linkInput = document.getElementById("link-input");
 const insertLinkBtn = document.getElementById("insert-link-btn");
+const drawingOptionsDropdown = document.getElementById("drawing-options-dropdown");
+
+drawingOptionsDropdown.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -38,6 +43,18 @@ let undoStack = [];
 let deleteEnabled = false;
 let currentStroke = null;
 let isDrawing = false;
+let currentTool = "pen";
+
+document.getElementById("drawing-tools").addEventListener("click", (e) => {
+  if (e.target && e.target.classList.contains("tool-option")) {
+    document.querySelectorAll("#drawing-tools .tool-option").forEach((btn) => {
+      btn.classList.remove("selected");
+    });
+    e.target.classList.add("selected");
+    currentTool = e.target.dataset.tool;
+    console.log("Selected tool:", currentTool);
+  }
+});
 
 function resizeCanvas() {
   const rect = workspace.getBoundingClientRect();
@@ -86,6 +103,8 @@ function getMousePosition(canvas, event) {
 let drawings = [];
 
 function startDrawing(e) {
+  if (drawingOptionsDropdown.style.display === "block") return;
+
   isDrawing = true;
   const pos = getMousePosition(canvas, e);
   console.log("Started drawing at:", pos);
@@ -103,14 +122,21 @@ function startDrawing(e) {
 }
 
 function draw(e) {
-  if (!isDrawing) return;
+  if (!isDrawing || !currentStroke) return;
   const pos = getMousePosition(canvas, e);
   ctx.beginPath();
   const lastPoint = currentStroke.path[currentStroke.path.length - 1];
   ctx.moveTo(lastPoint.x, lastPoint.y);
   ctx.lineTo(pos.x, pos.y);
-  ctx.strokeStyle = colorPicker.value;
-  ctx.lineWidth = parseInt(lineWidth.value, 10) || 2;
+  ctx.strokeStyle = document.getElementById("color-picker").value;
+  ctx.lineWidth = parseInt(document.getElementById("line-width").value, 10) || 2;
+  
+  if (currentTool === "highlighter") {
+    ctx.globalAlpha = 0.5;
+  } else {
+    ctx.globalAlpha = 1;
+  }
+  
   ctx.lineCap = "round";
   ctx.stroke();
   currentStroke.path.push({ x: pos.x, y: pos.y });
@@ -370,8 +396,18 @@ function makeDraggable(element) {
 }
 
 drawBtn.addEventListener("click", () => {
+  if (drawingOptionsDropdown.style.display === "block") return;
   disableAllModes();
   enableDrawing();
+});
+
+drawBtn.addEventListener("dblclick", (e) => {
+  if (drawingOptionsDropdown.style.display === "none" || drawingOptionsDropdown.style.display === "") {
+    drawingOptionsDropdown.style.display = "block";
+  } else {
+    drawingOptionsDropdown.style.display = "none";
+  }
+  e.stopPropagation();
 });
 
 addTextBtn.addEventListener("click", () => {
@@ -408,6 +444,11 @@ undoBtn.addEventListener("click", () => {
       lastAction.element.remove();
     }
   }
+});
+const closeDrawingOptions = document.getElementById("close-drawing-options");
+closeDrawingOptions.addEventListener("click", (e) => {
+  drawingOptionsDropdown.style.display = "none";
+  e.stopPropagation();
 });
 
 function reinitCanvas() {
