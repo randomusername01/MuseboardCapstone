@@ -1,13 +1,14 @@
+const { shell } = require("electron");
 const workspace = document.getElementById("workspace");
 let canvas = document.getElementById("drawing-canvas");
 let ctx = canvas.getContext("2d");
 
 const addTextBtn = document.getElementById("add-text-btn");
-const addImageBtn = document.getElementById("add-image-btn");
-const addGifBtn = document.getElementById("add-gif-btn");
+const addMediaBtn = document.getElementById("add-media-btn");
 const addLinkBtn = document.getElementById("add-link-btn");
 const drawBtn = document.getElementById("draw-btn");
 const clearBtn = document.getElementById("clear-btn");
+const undoBtn = document.getElementById("undo-btn");
 
 const linkModal = document.getElementById("link-modal");
 const linkInput = document.getElementById("link-input");
@@ -33,9 +34,10 @@ insertLinkBtn.addEventListener("click", () => {
   }
 });
 
-let isDrawing = false;
 let undoStack = [];
 let deleteEnabled = false;
+let currentStroke = null;
+let isDrawing = false;
 
 function resizeCanvas() {
   const rect = workspace.getBoundingClientRect();
@@ -90,31 +92,39 @@ function startDrawing(e) {
   ctx.beginPath();
   ctx.moveTo(pos.x, pos.y);
 
-  drawings.push({
+  currentStroke = {
     path: [{ x: pos.x, y: pos.y }],
     color: colorPicker.value,
     width: parseInt(lineWidth.value, 10) || 2,
-  });
+  };
 
+  drawings.push(currentStroke);
   canvas.addEventListener("mousemove", draw);
 }
 
 function draw(e) {
   if (!isDrawing) return;
   const pos = getMousePosition(canvas, e);
+  ctx.beginPath();
+  const lastPoint = currentStroke.path[currentStroke.path.length - 1];
+  ctx.moveTo(lastPoint.x, lastPoint.y);
   ctx.lineTo(pos.x, pos.y);
   ctx.strokeStyle = colorPicker.value;
   ctx.lineWidth = parseInt(lineWidth.value, 10) || 2;
   ctx.lineCap = "round";
   ctx.stroke();
-
-  drawings[drawings.length - 1].path.push({ x: pos.x, y: pos.y });
+  currentStroke.path.push({ x: pos.x, y: pos.y });
 }
 
 function stopDrawing() {
   isDrawing = false;
   ctx.closePath();
   canvas.removeEventListener("mousemove", draw);
+  if (currentStroke) {
+    undoStack.push({type: "drawing", stroke: currentStroke});
+    currentStroke = null;
+  }
+  redrawCanvas();
 }
 
 function addText(innerText = "Type your text here...", top = "100px", left = "100px") {
@@ -129,23 +139,23 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
   textBox.style.cursor = "move";
   workspace.appendChild(textBox);
 
-  undoStack.push(textBox);
+  undoStack.push({type: "element", element: textBox});
   makeDraggable(textBox);
 }
 
-function addImage(filePath = null, top = "150px", left = "150px") {
-  if (!filePath) {
-    ipcRenderer.invoke("select-file", "image").then((selectedFilePath) => {
-      if (!selectedFilePath) return;
-      const img = createImageElement(selectedFilePath, top, left);
-      workspace.appendChild(img);
-      undoStack.push(img);
-    });
-  } else {
-    const img = createImageElement(filePath, top, left);
-    workspace.appendChild(img);
-    undoStack.push(img);
-  }
+function addMedia(top = "150px", left = "150px") {
+  ipcRenderer.invoke("select-file", "media").then((selectedFilePath) => {
+    if (!selectedFilePath) return;
+    const lowerPath = selectedFilePath.toLowerCase();
+    let element;
+    if (lowerPath.endsWith(".gif")) {
+      element = createGifElement(selectedFilePath, top, left);
+    } else {
+      element = createImageElement(selectedFilePath, top, left);
+    }
+    workspace.appendChild(element);
+    undoStack.push({type: "element", element: element});
+  });
 }
 
 function createImageElement(src, top, left) {
@@ -162,21 +172,6 @@ function createImageElement(src, top, left) {
   return img;
 }
 
-function addGif(src = null, top = "200px", left = "200px") {
-  if (!src) {
-    ipcRenderer.invoke("select-file", "gif").then((selectedFilePath) => {
-      if (!selectedFilePath) return;
-      const gif = createGifElement(selectedFilePath, top, left);
-      workspace.appendChild(gif);
-      undoStack.push(gif);
-    });
-  } else {
-    const gif = createGifElement(src, top, left);
-    workspace.appendChild(gif);
-    undoStack.push(gif);
-  }
-}
-
 function createGifElement(src, top, left) {
   const gif = document.createElement("img");
   gif.src = src;
@@ -188,8 +183,6 @@ function createGifElement(src, top, left) {
   makeDraggable(gif);
   return gif;
 }
-
-const { shell } = require("electron");
 
 let linkBeingEdited = null;
 
@@ -214,7 +207,7 @@ function createLinkElement(linkUrl, top = "250px", left = "250px") {
   link.style.cursor = "move";
 
   workspace.appendChild(link);
-  undoStack.push(link);
+  undoStack.push({type: "element", element: link});
   makeDraggable(link);
 }
 
@@ -257,7 +250,7 @@ function isPointNearLine(point, p1, p2, lineWidth) {
   const dx = point.x - nearestX;
   const dy = point.y - nearestY;
   const distance = Math.sqrt(dx * dx + dy * dy);
-  return distance <= Math.max(50, lineWidth * 3);
+  return distance <= Math.max(10, lineWidth * 2);
 }
 
 function redrawCanvas() {
@@ -291,7 +284,7 @@ workspace.addEventListener("click", (event) => {
   if (target.tagName === "IMG" || target.tagName === "A" || target.dataset.type === "text") {
     console.log("Deleted element:", target);
     target.remove();
-    undoStack = undoStack.filter(item => item !== target);
+    undoStack = undoStack.filter(action => action.element !== target);
     return;
   }
   
@@ -386,14 +379,9 @@ addTextBtn.addEventListener("click", () => {
   addText();
 });
 
-addImageBtn.addEventListener("click", () => {
+addMediaBtn.addEventListener("click", () => {
   disableAllModes();
-  addImage();
-});
-
-addGifBtn.addEventListener("click", () => {
-  disableAllModes();
-  addGif();
+  addMedia();
 });
 
 addLinkBtn.addEventListener("click", () => {
@@ -406,6 +394,20 @@ clearBtn.addEventListener("click", () => {
   disableDrawing();
   clearContent();
   console.log("Delete mode:", deleteEnabled);
+});
+undoBtn.addEventListener("click", () => {
+  const lastAction = undoStack.pop();
+  if (lastAction) {
+    if (lastAction.type === "drawing") {
+      const index = drawings.indexOf(lastAction.stroke);
+      if (index !== -1) {
+        drawings.splice(index, 1);
+      }
+      redrawCanvas();
+    } else if (lastAction.type === "element") {
+      lastAction.element.remove();
+    }
+  }
 });
 
 function reinitCanvas() {
