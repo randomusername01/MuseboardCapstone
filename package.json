@@ -19,32 +19,32 @@
     "nodemon": "3.1.7"
   },
   "devDependencies": {
-    "electron": "33.2.1",
+    "electron": "^33.2.1",
     "electron-builder": "^25.1.8"
   },
   "build": {
     "win": {
-    "target": "nsis",
-    "icon": "builds/icons/museboard-icon.ico"
-  },
-  "nsis": {
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "createDesktopShortcut": true,
-    "createStartMenuShortcut": true
-  },
-  "mac": {
-    "target": "dmg",
-    "icon": "builds/icons/museboard-icon.icns"
-  },
-  "linux": {
-    "target": "AppImage",
-    "icon": "builds/icons/museboard-icon.png"
-  },
-  "appId": "com.museboard.app",
-  "productName": "MuseBoard",
-  "directories": {
-    "output": "dist"
-  }
+      "target": "nsis",
+      "icon": "builds/icons/museboard-icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "builds/icons/museboard-icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "builds/icons/museboard-icon.png"
+    },
+    "appId": "com.museboard.app",
+    "productName": "MuseBoard",
+    "directories": {
+      "output": "dist"
+    }
   }
 }
