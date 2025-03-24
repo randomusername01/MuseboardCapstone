@@ -53,13 +53,9 @@
             <i class="fas fa-font"></i>
             <span>Text</span>
           </button>
-          <button class="toolbar-btn" id="add-image-btn">
-            <i class="fas fa-image"></i>
-            <span>Image</span>
-          </button>
-          <button class="toolbar-btn" id="add-gif-btn">
-            <i class="fas fa-film"></i>
-            <span>GIF</span>
+          <button class="toolbar-btn" id="add-media-btn">
+            <i class="fas fa-photo-video"></i>
+            <span>Media</span>
           </button>
           <button class="toolbar-btn" id="add-link-btn">
             <i class="fas fa-link"></i>
@@ -73,14 +69,18 @@
             <i class="fas fa-eraser"></i>
             <span>Clear</span>
           </button>
+          <button class="toolbar-btn" id="undo-btn">
+            <i class="fas fa-undo"></i>
+            <span>Undo</span>
+          </button>
 
           <input type="color" id="color-picker" value="#34495e">
           <input type="range" id="line-width" min="1" max="10" value="2">
         </div>
 
-        <canvas id="drawing-canvas"></canvas>
-
-        <div id="workspace"></div>
+        <div id="workspace">
+          <canvas id="drawing-canvas" data-type="drawing"></canvas>
+        </div>
 
         <!-- for adding Links -->
         <div id="link-modal" class="modal">

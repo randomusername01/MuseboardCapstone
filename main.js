@@ -1,4 +1,9 @@
 const { app, BrowserWindow, ipcMain, screen, Menu, dialog } = require("electron");
+
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled Promise Rejection:", error);
+});
+
 const path = require("path");
 const fs = require('fs');
 const settings = require("electron-settings");
@@ -27,9 +32,21 @@ const setDefaultSettings = () => {
   });
 };
 
-const setAutoLaunch = (enabled) => {
-  enabled ? autoLauncher.enable() : autoLauncher.disable();
-  console.log(`AUTO LAUNCH ${enabled ? "ENABLED" : "DISABLED"}`);
+const setAutoLaunch = async (enabled) => {
+  try {
+    if (enabled) {
+      await autoLauncher.enable();
+    } else {
+      await autoLauncher.disable();
+    }
+    console.log(`AUTO LAUNCH ${enabled ? "ENABLED" : "DISABLED"}`);
+  } catch (error) {
+    if (error.message.includes("Can’t get login item")) {
+      console.warn("Auto-launch error ignored: Login item does not exist.");
+    } else {
+      console.error("Failed to set auto-launch:", error);
+    }
+  }
 };
 
 async function createWindow() {
@@ -54,6 +71,8 @@ async function createWindow() {
   });
 
   mainWindow.loadFile("index.html");
+  mainWindow.webContents.openDevTools({mode: 'detach'});
+
 
   mainWindow.webContents.on("did-finish-load", () => {
     mainWindow.webContents.send("apply-settings", currentSettings);
