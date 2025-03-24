@@ -143,6 +143,7 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
   makeDraggable(textBox);
 }
 
+
 function addMedia(top = "150px", left = "150px") {
   ipcRenderer.invoke("select-file", "media").then((selectedFilePath) => {
     if (!selectedFilePath) return;

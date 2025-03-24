@@ -5,17 +5,17 @@ function convertImageToBase64(imagePath) {
     // Check if the image is a GIF
     if (imagePath.toLowerCase().endsWith('.gif')) {
       fetch(imagePath)
-        .then(response => response.blob()) // Fetch the image as a Blob
+        .then(response => response.blob())
         .then(blob => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result);
           reader.onerror = reject;
-          reader.readAsDataURL(blob); // Read image Blob as base64 string
+          reader.readAsDataURL(blob);
         })
-        .catch(reject); // Handle fetch errors
+        .catch(reject);
     } else {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result); // result contains the base64 encoded string
+      reader.onloadend = () => resolve(reader.result);
       reader.onerror = reject;
 
       const img = new Image();
@@ -34,48 +34,43 @@ function convertImageToBase64(imagePath) {
 
 
 async function grabWorkspaceAndCanvas() {
-  // Get all image elements in the workspace
-  const images = document.querySelectorAll('#workspace img');
+  const images = document.querySelectorAll("#workspace img");
 
-  // Replace image paths with base64 data
   for (const img of images) {
     const src = img.src;
-    if (src.startsWith('file://')) {
-      // Assuming it's a local file path, convert it to base64
+    if (src.startsWith("file://")) {
       const base64Src = await convertImageToBase64(src);
-      // Replace the image's source with the base64 string
       img.src = base64Src;
     }
   }
 
-  // Get the canvas element in the workspace
-  const canvas = document.querySelector('canvas');
+  const canvas = document.querySelector("canvas");
   let canvasState = null;
 
   if (canvas) {
-    // Capture the drawing data and attributes of the canvas
-    const drawingData = canvas.toDataURL(); // Get base64 data for canvas drawing
+    const drawingData = canvas.toDataURL("image/png");
+
     const canvasAttributes = {};
     for (const attr of canvas.attributes) {
       canvasAttributes[attr.name] = attr.value;
     }
 
-    // Store the canvas data and attributes
+    const thumbnailBase64 = generateThumbnail(canvas);
+
     canvasState = {
       drawingData,
       canvasAttributes,
+      thumbnailBase64,
     };
   }
 
-  // Serialize the entire workspace HTML
   const workspaceHTML = workspace.outerHTML;
 
-  // Get workspace dimensions and position
   const workspaceMetadata = {
     width: workspace.offsetWidth,
     height: workspace.offsetHeight,
-    top: workspace.style.top || '0px',
-    left: workspace.style.left || '0px',
+    top: workspace.style.top || "0px",
+    left: workspace.style.left || "0px",
   };
 
   return {
@@ -85,14 +80,30 @@ async function grabWorkspaceAndCanvas() {
   };
 }
 
+function generateThumbnail(canvas) {
+  const THUMB_WIDTH = 200;
+
+  if (canvas.width === 0 || canvas.height === 0) return null;
+
+  const thumbCanvas = document.createElement("canvas");
+  const scale = THUMB_WIDTH / canvas.width;
+  thumbCanvas.width = THUMB_WIDTH;
+  thumbCanvas.height = canvas.height * scale;
+
+  const tctx = thumbCanvas.getContext("2d");
+  tctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+
+  return thumbCanvas.toDataURL("image/png");
+}
+
 const saveBoard = async (boardData) => {
-  const result = await ipcRenderer.invoke('save-board', boardData);
+  const result = await ipcRenderer.invoke("save-board", boardData);
   if (result.success) {
     alert(`Board saved to ${result.filePath}`);
   } else {
     alert(`Failed to save board: ${result.error}`);
   }
-}
+};
 
 function applySettings(settings) {
   if (settings.darkMode) {
@@ -110,41 +121,33 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
     return;
   }
 
-  // Clear the current workspace
   clearContent();
 
-  // Parse the saved workspace HTML
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = boardData.html;
 
   const newWorkspace = tempDiv.firstChild;
 
   if (newWorkspace) {
-    // Iterate through child elements of the workspace
     const elements = newWorkspace.children;
     Array.from(elements).forEach((element) => {
       console.log(element);
 
-      // Adding text
       if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'text') {
         addText(element.innerText, element.style.top, element.style.left);
       }
-      // Adding image
       else if (element.tagName.toLowerCase() === 'img' && /^data:image\/png;base64,/.test(element.getAttribute('src'))) {
         addImage(element.getAttribute('src'), element.style.top, element.style.left);
       }
-      // Adding gif
       else if (element.tagName.toLowerCase() === 'img' && /^data:image\/gif;base64,/.test(element.getAttribute('src'))) {
         addGif(element.getAttribute('src'), element.style.top, element.style.left);
       }
-      // Adding link
       else if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'link') {
         const anchor = element.querySelector('a');
         createLinkElement(anchor.href, element.style.top, element.style.left);
       }
     });
 
-    // Handle the canvas outside the workspace
     const storedCanvas = boardData.canvasState;
     console.log(storedCanvas.canvasAttributes);
 
@@ -153,7 +156,6 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
       if (contentArea) {
         const existingCanvas = contentArea.querySelector('canvas');
 
-        // Create a new canvas
         const newCanvas = document.createElement('canvas');
         for (const [name, value] of Object.entries(storedCanvas.canvasAttributes)) {
           newCanvas.setAttribute(name, value);
@@ -161,7 +163,6 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
 
         newCanvas.id = "drawing-canvas";
 
-        // Restore the drawing data on the new canvas
         const ctx = newCanvas.getContext('2d');
         const img = new Image();
         img.src = boardData.canvasState.drawingData;
@@ -202,19 +203,15 @@ ipcRenderer.on(
   }
 );
 
-// Load settings from the main process
 async function loadSettings() {
   const settings = await ipcRenderer.invoke("get-settings");
   console.log("Loaded settings:", settings);
   return settings;
 }
 
-// Function to save a setting to the settings file
 async function saveSetting(key, value) {
-  // Calling the main process to save the setting
   await ipcRenderer.invoke("save-setting", key, value);
 
-  // After saving, reload and apply the settings
   const settings = await ipcRenderer.invoke("get-settings");
   applySettings(settings);
 }
@@ -254,7 +251,6 @@ function togglePanel() {
 
 toggleButton.addEventListener("click", togglePanel);
 
-// Toggle settings dropdown
 settingsButton.addEventListener("click", (e) => {
   e.stopPropagation();
   settingsDropdown.style.display =
@@ -269,7 +265,6 @@ document.addEventListener("click", () => {
   settingsDropdown.style.display = "none";
 });
 
-// Theme Customizer Toggle
 document
   .querySelector('[data-action="customize-theme"]')
   .addEventListener("click", () => {
@@ -298,38 +293,109 @@ toggleDarkMode.addEventListener("change", (e) => {
 });
 
 const openBtn = document.getElementById("openBtn");
-const saveBtn = document.getElementById("saveBtn");
 const saveAsBtn = document.getElementById("saveAsBtn");
 
 if (openBtn) {
-  openBtn.addEventListener("click", async () => {
-    try {
-      const result = await ipcRenderer.invoke('open-board-file');
-      if (result && result.success) {
-        console.log("Board loaded successfully");
-      } else {
-        alert('Failed to open the board file.');
-      }
-    } catch (error) {
-      console.error('Error opening board:', error);
-      alert('An error occurred while opening the board file.');
-    }
+  openBtn.addEventListener("click", () => {
+    ipcRenderer.send("open-custom-browser");
     settingsDropdown.style.display = "none";
   });
 }
+
+const saveBtn = document.getElementById("saveBtn");
+console.log("saveBtn is:", saveBtn);
 
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     console.log("Save clicked");
+
+    const userTitle = await customPrompt("Enter board title:") || "Untitled Board";
+    console.log("User title is:", userTitle);
+
+    const tagString = await customPrompt("Enter tags (comma-separated):");
+    let tags = [];
+    if (tagString) {
+      tags = tagString.split(",").map(t => t.trim());
+    }
+
+    console.log("Tags array is:", tags);
+
     let workspaceData = await grabWorkspaceAndCanvas();
+    workspaceData.title = userTitle;
+    workspaceData.tags = tags;
     saveBoard(workspaceData);
-    settingsDropdown.style.display = "none";
   });
 }
+
+
+
 
 if (saveAsBtn) {
   saveAsBtn.addEventListener("click", () => {
     console.log("Save As clicked");
     settingsDropdown.style.display = "none";
+  });
+}
+
+function customPrompt(message) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.right = '0';
+    overlay.style.bottom = '0';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '9999';
+    document.body.appendChild(overlay);
+
+    const dialog = document.createElement('div');
+    dialog.style.backgroundColor = '#fff';
+    dialog.style.padding = '20px';
+    dialog.style.borderRadius = '5px';
+    dialog.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+    dialog.style.minWidth = '300px';
+    overlay.appendChild(dialog);
+
+    const label = document.createElement('label');
+    label.innerText = message;
+    label.style.display = 'block';
+    label.style.marginBottom = '8px';
+    dialog.appendChild(label);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.style.width = '100%';
+    input.style.marginBottom = '12px';
+    dialog.appendChild(input);
+
+    const buttonRow = document.createElement('div');
+    buttonRow.style.textAlign = 'right';
+    dialog.appendChild(buttonRow);
+
+    const okBtn = document.createElement('button');
+    okBtn.innerText = 'OK';
+    okBtn.style.marginRight = '10px';
+    buttonRow.appendChild(okBtn);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.innerText = 'Cancel';
+    buttonRow.appendChild(cancelBtn);
+
+    okBtn.addEventListener('click', () => {
+      const value = input.value.trim();
+      document.body.removeChild(overlay); 
+      resolve(value || null);
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      document.body.removeChild(overlay);
+      resolve(null);
+    });
+
+    input.focus();
   });
 }
