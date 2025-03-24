@@ -134,24 +134,110 @@ const setupIpcHandlers = () => {
       return { success: false, error: error.message };
     }
   });
-  ipcMain.handle('save-board', async (e, data) => {
+
+  ipcMain.handle("save-board", async (e, data) => {
+    const suggestedName = data.title && data.title.trim() !== ""
+      ? data.title
+      : "board1";
+
     const { canceled, filePath } = await dialog.showSaveDialog({
-      filters: [
-        { name: "MuseBoard Files", extensions: ['board'] }
-      ],
-      defaultPath: 'board1.board'
+      filters: [{ name: "MuseBoard Files", extensions: ["board"] }],
+      defaultPath: suggestedName + ".board",
     });
 
-    if (canceled || !filePath) return { success: false };
+    if (canceled || !filePath) {
+      return { success: false, error: "User canceled save dialog." };
+    }
 
     try {
-      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+
+      const metadataPath = path.join(app.getPath("userData"), "boards-metadata.json");
+      let boardsMetadata = [];
+
+      if (fs.existsSync(metadataPath)) {
+        boardsMetadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      }
+
+      let entry = boardsMetadata.find((b) => b.filePath === filePath);
+      if (!entry) {
+        entry = { filePath };
+        boardsMetadata.push(entry);
+      }
+
+      entry.title = data.title || path.basename(filePath);
+
+      entry.tags = data.tags || [];
+
+      const thumb = data.canvasState?.thumbnailBase64 || null;
+      entry.thumbnailBase64 = thumb;
+
+      fs.writeFileSync(metadataPath, JSON.stringify(boardsMetadata, null, 2), "utf-8");
+
       return { success: true, filePath };
     } catch (error) {
       console.error(error);
-      return { success: false, error };
+      return { success: false, error: error.message };
     }
   });
+
+  ipcMain.handle("edit-board-metadata", async (e, { filePath, title, tags }) => {
+    try {
+      const metadataPath = path.join(app.getPath("userData"), "boards-metadata.json");
+      let boardsMetadata = [];
+      if (fs.existsSync(metadataPath)) {
+        boardsMetadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      }
+
+      const entry = boardsMetadata.find((b) => b.filePath === filePath);
+      if (!entry) {
+        return { success: false, error: "No existing board entry found." };
+      }
+
+      entry.title = title;
+      entry.tags = tags;
+
+      fs.writeFileSync(metadataPath, JSON.stringify(boardsMetadata, null, 2), "utf-8");
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error editing metadata:", error);
+      return { success: false, error: error.message };
+    }
+  });
+
+
+
+  let boardsMetadata = [];
+
+  ipcMain.handle('get-all-boards-metadata', async () => {
+    try {
+      const metadataPath = path.join(app.getPath('userData'), 'boards-metadata.json');
+      if (fs.existsSync(metadataPath)) {
+        const raw = fs.readFileSync(metadataPath, 'utf-8');
+        boardsMetadata = JSON.parse(raw);
+      }
+    } catch (err) {
+      console.error('Error reading boards-metadata.json:', err);
+    }
+
+    return boardsMetadata;
+  });
+
+  ipcMain.on('open-specific-board', (event, filePath) => {
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const boardData = JSON.parse(fileContent);
+      mainWindow.webContents.send('load-board-data', boardData);
+
+      if (modalWindow) modalWindow.close();
+
+    } catch (err) {
+      console.error('Error opening specific board:', err);
+    }
+  });
+
+
 };
 
 app.whenReady().then(() => {
@@ -188,4 +274,46 @@ ipcMain.handle("select-file", async (event, fileType) => {
 
   if (result.canceled) return null;
   return result.filePaths[0];
+});
+
+function openCustomFileBrowser() {
+  if (modalWindow) {
+    modalWindow.close();
+  }
+
+  modalWindow = new BrowserWindow({
+    parent: mainWindow,
+    modal: true,
+    width: 600,
+    height: 500,
+    resizable: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  modalWindow.loadFile('custom-file-browser.html');
+
+  modalWindow.on('closed', () => {
+    modalWindow = null;
+  });
+}
+
+function generateThumbnail(canvas) {
+  const tempCanvas = document.createElement('canvas');
+  const tctx = tempCanvas.getContext('2d');
+
+  const width = 200;
+  const scale = width / canvas.width;
+  const height = canvas.height * scale;
+  tempCanvas.width = width;
+  tempCanvas.height = height;
+
+  tctx.drawImage(canvas, 0, 0, width, height);
+  return tempCanvas.toDataURL('image/png');
+}
+
+ipcMain.on('open-custom-browser', () => {
+  openCustomFileBrowser();
 });

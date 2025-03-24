@@ -1,9 +1,7 @@
-// DOM Elements
 const workspace = document.getElementById("workspace");
 let canvas = document.getElementById("drawing-canvas");
 let ctx = canvas.getContext("2d");
 
-// Toolbar Buttons
 const addTextBtn = document.getElementById("add-text-btn");
 const addImageBtn = document.getElementById("add-image-btn");
 const addGifBtn = document.getElementById("add-gif-btn");
@@ -82,7 +80,6 @@ function stopDrawing() {
   ctx.closePath();
 }
 
-// Add Text to Workspace with optional parameters for innerText, top, and left
 function addText(innerText = "Type your text here...", top = "100px", left = "100px") {
   const textBox = document.createElement("div");
   textBox.setAttribute("data-type", "text");
@@ -99,14 +96,11 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
   makeDraggable(textBox);
 }
 
-// Add Image to Workspace
 function addImage(filePath = null, top = "150px", left = "150px") {
-  // If filePath is not provided, prompt the user to select a file
   if (!filePath) {
     ipcRenderer.invoke("select-file", "image").then((selectedFilePath) => {
       if (!selectedFilePath) return;
 
-      // Create image element and set properties
       const img = document.createElement("img");
       img.src = selectedFilePath;
       img.style.position = "absolute";
@@ -118,11 +112,9 @@ function addImage(filePath = null, top = "150px", left = "150px") {
       img.style.cursor = "move";
       workspace.appendChild(img);
 
-      // Enable dragging functionality
       makeDraggable(img);
     });
   } else {
-    // Create image element with provided file path
     const img = document.createElement("img");
     img.src = filePath;
     img.style.position = "absolute";
@@ -134,19 +126,15 @@ function addImage(filePath = null, top = "150px", left = "150px") {
     img.style.cursor = "move";
     workspace.appendChild(img);
 
-    // Enable dragging functionality
     makeDraggable(img);
   }
 }
 
-// Add GIF to Workspace
 function addGif(src = null, top = "200px", left = "200px") {
-  // If src is not provided, prompt the user to select a file
   if (!src) {
     ipcRenderer.invoke("select-file", "gif").then((selectedFilePath) => {
       if (!selectedFilePath) return;
 
-      // Create GIF element and set properties
       const gif = document.createElement("img");
       gif.src = selectedFilePath;
       gif.style.position = "absolute";
@@ -156,11 +144,9 @@ function addGif(src = null, top = "200px", left = "200px") {
       gif.style.cursor = "move";
       workspace.appendChild(gif);
 
-      // Enable dragging functionality
       makeDraggable(gif);
     });
   } else {
-    // Create GIF element with provided src
     const gif = document.createElement("img");
     gif.src = src;
     gif.style.position = "absolute";
@@ -170,15 +156,13 @@ function addGif(src = null, top = "200px", left = "200px") {
     gif.style.cursor = "move";
     workspace.appendChild(gif);
 
-    // Enable dragging functionality
     makeDraggable(gif);
   }
 }
 
 const { shell } = require("electron");
 
-// Link logic ...
-let linkBeingEdited = null;  // You might need this or have it declared above
+let linkBeingEdited = null;
 
 addLinkBtn.addEventListener("click", () => {
   linkInput.value = "";
@@ -186,20 +170,15 @@ addLinkBtn.addEventListener("click", () => {
   linkBeingEdited = null;
 });
 
-// Handle insert link button ...
 function createLinkElement(linkUrl, top, left) {
   // ...
 }
 
-// Clear Workspace
 function clearContent() {
-  // Clear the drawing canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // Remove all added elements (text, images, links)
   workspace.innerHTML = "";
 }
 
-// Make Element Draggable
 function makeDraggable(element) {
   let isDragging = false;
   let startX, startY, elementX, elementY;
@@ -238,7 +217,6 @@ addGifBtn.addEventListener("click", () => {
 clearBtn.addEventListener("click", clearContent);
 
 function reinitCanvas() {
-  // Grab the new canvas by ID again
   canvas = document.getElementById("drawing-canvas");
   ctx = canvas.getContext("2d");
 
