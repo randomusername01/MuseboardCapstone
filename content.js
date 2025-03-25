@@ -315,9 +315,12 @@ function isPointNearLine(point, p1, p2, lineWidth) {
 function redrawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawings.forEach((stroke) => {
-    ctx.beginPath();
-    ctx.lineCap = "round";
+    ctx.save();
     if (stroke.tool !== "brush") {
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      
+      ctx.beginPath();
       ctx.strokeStyle = stroke.color;
       ctx.lineWidth = stroke.width;
       let effectiveAlpha = 1;
@@ -328,6 +331,7 @@ function redrawCanvas() {
         ctx.lineWidth = stroke.width + 3;
       }
       ctx.globalAlpha = effectiveAlpha;
+      ctx.lineCap = "round";
       stroke.path.forEach((point, i) => {
         if (i === 0) {
           ctx.moveTo(point.x, point.y);
@@ -336,17 +340,20 @@ function redrawCanvas() {
         }
       });
       ctx.stroke();
+      ctx.closePath();
     } else {
-      ctx.save();
       ctx.shadowColor = stroke.color;
       ctx.shadowBlur = 6;
+      
       for (let offsetX = -1; offsetX <= 1; offsetX++) {
         for (let offsetY = -1; offsetY <= 1; offsetY++) {
           ctx.save();
           ctx.translate(offsetX, offsetY);
+          ctx.beginPath();
           ctx.strokeStyle = stroke.color;
           ctx.lineWidth = stroke.width + 2;
           ctx.globalAlpha = 1;
+          ctx.lineCap = "round";
           stroke.path.forEach((point, i) => {
             if (i === 0) {
               ctx.moveTo(point.x, point.y);
@@ -355,12 +362,12 @@ function redrawCanvas() {
             }
           });
           ctx.stroke();
+          ctx.closePath();
           ctx.restore();
         }
       }
-      ctx.restore();
     }
-    ctx.closePath();
+    ctx.restore();
   });
 }
 
