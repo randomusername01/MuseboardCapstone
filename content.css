@@ -70,6 +70,9 @@
     flex-direction: column;
     align-items: center;
 }
+.apply-theme {
+    color: #34495E;
+}
 
 .toolbar-btn i {
     font-size: 1.4em;
