@@ -13,6 +13,11 @@ const undoBtn = document.getElementById("undo-btn");
 const linkModal = document.getElementById("link-modal");
 const linkInput = document.getElementById("link-input");
 const insertLinkBtn = document.getElementById("insert-link-btn");
+const drawingOptionsDropdown = document.getElementById("drawing-options-dropdown");
+
+drawingOptionsDropdown.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -38,6 +43,36 @@ let undoStack = [];
 let deleteEnabled = false;
 let currentStroke = null;
 let isDrawing = false;
+
+const toolDefaults = {
+  pen: { lineWidth: 3, color: "#000000" },
+  pencil: { lineWidth: 2, color: "#888888" },
+  highlighter: { lineWidth: 8, color: "#ffff00" }, // thick & yellow
+  brush: { lineWidth: 4, color: "#34495e" }
+};
+let toolActive = {
+  pen: { ...toolDefaults.pen },
+  pencil: { ...toolDefaults.pencil },
+  highlighter: { ...toolDefaults.highlighter },
+  brush: { ...toolDefaults.brush }
+};
+let activeSettings = { ...toolDefaults.pen, tool: "pen" };
+let currentTool = "pen";
+document.getElementById("drawing-tools").addEventListener("click", (e) => {
+  if (e.target && e.target.classList.contains("tool-option")) {
+    document.querySelectorAll("#drawing-tools .tool-option").forEach((btn) => {
+      btn.classList.remove("selected");
+    });
+    e.target.classList.add("selected");
+    currentTool = e.target.dataset.tool;
+    document.getElementById("color-picker").value = toolActive[currentTool].color;
+    document.getElementById("line-width").value = toolActive[currentTool].lineWidth;
+    
+    activeSettings = { ...toolActive[currentTool], tool: currentTool };
+    
+    console.log("Selected tool:", currentTool, "Active settings:", activeSettings);
+  }
+});
 
 function resizeCanvas() {
   const rect = workspace.getBoundingClientRect();
@@ -94,8 +129,9 @@ function startDrawing(e) {
 
   currentStroke = {
     path: [{ x: pos.x, y: pos.y }],
-    color: colorPicker.value,
-    width: parseInt(lineWidth.value, 10) || 2,
+    color: activeSettings.color,
+    width: activeSettings.lineWidth,
+    tool: activeSettings.tool
   };
 
   drawings.push(currentStroke);
@@ -103,16 +139,38 @@ function startDrawing(e) {
 }
 
 function draw(e) {
-  if (!isDrawing) return;
+  if (!isDrawing || !currentStroke) return;
   const pos = getMousePosition(canvas, e);
   ctx.beginPath();
   const lastPoint = currentStroke.path[currentStroke.path.length - 1];
   ctx.moveTo(lastPoint.x, lastPoint.y);
   ctx.lineTo(pos.x, pos.y);
-  ctx.strokeStyle = colorPicker.value;
-  ctx.lineWidth = parseInt(lineWidth.value, 10) || 2;
+  
+  ctx.strokeStyle = currentStroke.color;
+  
+  let effectiveLineWidth = currentStroke.width;
+  let effectiveAlpha = 1;
+  
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  
+  if (currentStroke.tool === "pencil") {
+    effectiveAlpha = 0.8;
+  } else if (currentStroke.tool === "highlighter") {
+    effectiveAlpha = 0.5;
+    effectiveLineWidth = currentStroke.width + 3;
+  } else if (currentStroke.tool === "brush") {
+    effectiveAlpha = 1;
+    effectiveLineWidth = currentStroke.width + 2;
+    ctx.shadowColor = currentStroke.color;
+    ctx.shadowBlur = 4;
+  }
+  
+  ctx.globalAlpha = effectiveAlpha;
+  ctx.lineWidth = effectiveLineWidth;
   ctx.lineCap = "round";
   ctx.stroke();
+  
   currentStroke.path.push({ x: pos.x, y: pos.y });
 }
 
@@ -258,16 +316,50 @@ function redrawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawings.forEach((stroke) => {
     ctx.beginPath();
-    ctx.strokeStyle = stroke.color;
-    ctx.lineWidth = stroke.width;
-    stroke.path.forEach((point, i) => {
-      if (i === 0) {
-        ctx.moveTo(point.x, point.y);
-      } else {
-        ctx.lineTo(point.x, point.y);
+    ctx.lineCap = "round";
+    if (stroke.tool !== "brush") {
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.width;
+      let effectiveAlpha = 1;
+      if (stroke.tool === "pencil") {
+        effectiveAlpha = 0.8;
+      } else if (stroke.tool === "highlighter") {
+        effectiveAlpha = 0.5;
+        ctx.lineWidth = stroke.width + 3;
       }
-    });
-    ctx.stroke();
+      ctx.globalAlpha = effectiveAlpha;
+      stroke.path.forEach((point, i) => {
+        if (i === 0) {
+          ctx.moveTo(point.x, point.y);
+        } else {
+          ctx.lineTo(point.x, point.y);
+        }
+      });
+      ctx.stroke();
+    } else {
+      ctx.save();
+      ctx.shadowColor = stroke.color;
+      ctx.shadowBlur = 6;
+      for (let offsetX = -1; offsetX <= 1; offsetX++) {
+        for (let offsetY = -1; offsetY <= 1; offsetY++) {
+          ctx.save();
+          ctx.translate(offsetX, offsetY);
+          ctx.strokeStyle = stroke.color;
+          ctx.lineWidth = stroke.width + 2;
+          ctx.globalAlpha = 1;
+          stroke.path.forEach((point, i) => {
+            if (i === 0) {
+              ctx.moveTo(point.x, point.y);
+            } else {
+              ctx.lineTo(point.x, point.y);
+            }
+          });
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+      ctx.restore();
+    }
     ctx.closePath();
   });
 }
@@ -371,8 +463,61 @@ function makeDraggable(element) {
 }
 
 drawBtn.addEventListener("click", () => {
+  if (drawingOptionsDropdown.style.display === "block") return;
   disableAllModes();
   enableDrawing();
+});
+
+drawBtn.addEventListener("dblclick", (e) => {
+  if (drawingOptionsDropdown.style.display === "none" || drawingOptionsDropdown.style.display === "") {
+    drawingOptionsDropdown.style.display = "block";
+    
+    document.getElementById("color-picker").value = toolActive[currentTool].color;
+    document.getElementById("line-width").value = toolActive[currentTool].lineWidth;
+    
+    document.querySelectorAll("#drawing-tools .tool-option").forEach((btn) => {
+      btn.classList.remove("selected");
+      if (btn.dataset.tool === currentTool) {
+        btn.classList.add("selected");
+      }
+    });
+  } else {
+    drawingOptionsDropdown.style.display = "none";
+  }
+  e.stopPropagation();
+});
+
+const applyThemeBtn = document.getElementById("apply-theme-btn");
+
+applyThemeBtn.addEventListener("click", (e) => {
+  toolActive[currentTool] = {
+    color: document.getElementById("color-picker").value,
+    lineWidth: parseInt(document.getElementById("line-width").value, 10) || toolDefaults[currentTool].lineWidth
+  };
+  
+  activeSettings = { ...toolActive[currentTool], tool: currentTool };
+  
+  console.log("Theme applied for", currentTool, ":", activeSettings);
+  drawingOptionsDropdown.style.display = "none";
+  e.stopPropagation();
+});
+
+const resetToolsBtn = document.getElementById("reset-tools-btn");
+
+resetToolsBtn.addEventListener("click", (e) => {
+  toolActive = {
+    pen: { ...toolDefaults.pen },
+    pencil: { ...toolDefaults.pencil },
+    highlighter: { ...toolDefaults.highlighter },
+    brush: { ...toolDefaults.brush }
+  };
+  document.getElementById("color-picker").value = toolActive[currentTool].color;
+  document.getElementById("line-width").value = toolActive[currentTool].lineWidth;
+  
+  activeSettings = { ...toolActive[currentTool], tool: currentTool };
+  
+  console.log("Tools reset to defaults.");
+  e.stopPropagation();
 });
 
 addTextBtn.addEventListener("click", () => {
@@ -409,6 +554,11 @@ undoBtn.addEventListener("click", () => {
       lastAction.element.remove();
     }
   }
+});
+const closeDrawingOptions = document.getElementById("close-drawing-options");
+closeDrawingOptions.addEventListener("click", (e) => {
+  drawingOptionsDropdown.style.display = "none";
+  e.stopPropagation();
 });
 
 function reinitCanvas() {
