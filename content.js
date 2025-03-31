@@ -15,6 +15,26 @@ const linkInput = document.getElementById("link-input");
 const insertLinkBtn = document.getElementById("insert-link-btn");
 const drawingOptionsDropdown = document.getElementById("drawing-options-dropdown");
 
+const tutorialButton = document.getElementById("tutorialButton");
+const tutorialModal = document.getElementById("tutorial-modal");
+const closeTutorialBtn = document.getElementById("close-tutorial-btn");
+
+tutorialButton.addEventListener("click", (e) => {
+  tutorialModal.style.display = "block";
+  e.stopPropagation();
+});
+
+closeTutorialBtn.addEventListener("click", (e) => {
+  tutorialModal.style.display = "none";
+  e.stopPropagation();
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target === tutorialModal) {
+    tutorialModal.style.display = "none";
+  }
+});
+
 drawingOptionsDropdown.addEventListener("click", (e) => {
   e.stopPropagation();
 });

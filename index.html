@@ -19,6 +19,46 @@
     <div class="panel-content">
       <header class="panel-header">
         <span class="title">MuseBoard</span>
+        <button class="tutorial-btn" id="tutorialButton">
+          <i class="fas fa-question"></i>
+        </button>
+        <!-- Tutorial Modal -->
+        <div id="tutorial-modal" class="modal">
+          <div class="modal-content">
+            <button id="close-tutorial-btn" class="close-modal">X</button>
+            <h2>Tutorial</h2>
+            <div id="tutorial-content" style="overflow-y: auto; max-height: 400px;">
+              <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 20px;">
+                  <strong>Text:</strong> Click the Text button to add a text box.
+                  <i class="fas fa-font" style="margin-left: 10px;"></i>
+                </li>
+                <li style="margin-bottom: 20px;">
+                  <strong>Media:</strong> Click the Media button to add images or GIFs.
+                  <i class="fas fa-photo-video" style="margin-left: 10px;"></i>
+                </li>
+                <li style="margin-bottom: 20px;">
+                  <strong>Link:</strong> Click the Link button to add a clickable link.
+                  <i class="fas fa-link" style="margin-left: 10px;"></i>
+                </li>
+                <li style="margin-bottom: 20px;">
+                  <strong>Draw:</strong> Click the Draw button to enter drawing mode. Double-click it to open drawing options where you can customize color, thickness, and tools.
+                  <i class="fas fa-pencil-alt" style="margin-left: 10px;"></i>
+                </li>
+                <li style="margin-bottom: 20px;">
+                  <strong>Clear / Undo:</strong> Use the Clear button to click and delete items on the canvas and the Undo button to revert your last action.
+                  <i class="fas fa-eraser" style="margin-left: 10px;"></i>
+                </li>
+                <li style="margin-bottom: 20px;">
+                  <strong>Settings & Theme Customization:</strong> Click the Settings button to open the settings dropdown. Here you can customize themes and other preferences.
+                  <i class="fas fa-cog" style="margin-left: 10px;"></i>
+                  <!-- Placeholder image for screenshot -->
+                  <img src="path/to/settings-screenshot.png" alt="Settings dropdown screenshot" style="display: block; max-width: 100%; margin-top: 5px;">
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
         <button class="settings-btn" id="settingsButton">
           <i class="fas fa-cog"></i>
         </button>
@@ -78,7 +118,6 @@
               <button class="tool-option" data-tool="highlighter">Highlighter</button>
               <button class="tool-option" data-tool="brush">Brush</button>
             </div>
-            <button id="apply-theme-btn" class="apply-theme">Apply Theme</button>
             <button id="reset-tools-btn" class="apply-theme">Reset Tools</button>
             <button id="close-drawing-options" class="close-dropdown">X</button>
           </div>
