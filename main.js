@@ -71,7 +71,7 @@ async function createWindow() {
   });
 
   mainWindow.loadFile("index.html");
-  mainWindow.webContents.openDevTools({mode: 'detach'});
+  // mainWindow.webContents.openDevTools({mode: 'detach'});
 
 
   mainWindow.webContents.on("did-finish-load", () => {
@@ -259,11 +259,22 @@ const setupIpcHandlers = () => {
 
 };
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   Menu.setApplicationMenu(null);
   setDefaultSettings();
   setupIpcHandlers();
-  createWindow();
+  await createWindow(); // Wait until mainWindow is created
+
+  // After the main window is created, adjust its bounds to open the panel automatically
+  mainWindow.once("ready-to-show", () => {
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    const panelWidth = Math.floor(width / 3) - 40;
+    mainWindow.setBounds({
+      x: width - panelWidth - 60,
+      width: panelWidth + 60,
+      height,
+    });
+  });
 });
 
 app.on("window-all-closed", () => {

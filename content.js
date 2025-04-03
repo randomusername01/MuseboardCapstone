@@ -101,7 +101,14 @@ function resizeCanvas() {
   redrawCanvas();
 }
 
-window.addEventListener("load", resizeCanvas);
+window.addEventListener("load", () => {
+  resizeCanvas();
+  workspace.style.display = "block";
+  if (!isPanelVisible) {
+    togglePanel();
+  }
+});
+
 window.addEventListener("resize", resizeCanvas);
 
 let drawingEnabled = false;
@@ -215,7 +222,9 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
   textBox.style.left = left;
   textBox.style.fontSize = "1em";
   textBox.style.cursor = "move";
+  textBox.style.zIndex = 4;
   workspace.appendChild(textBox);
+  textBox.focus();
 
   undoStack.push({type: "element", element: textBox});
   makeDraggable(textBox);
@@ -247,6 +256,7 @@ function createImageElement(src, top, left) {
   img.style.border = "1px solid #ddd";
   img.style.boxShadow = "2px 2px 5px rgba(0, 0, 0, 0.3)";
   img.style.cursor = "move";
+  img.style.zIndex = "4";
   makeDraggable(img);
   return img;
 }
@@ -259,6 +269,7 @@ function createGifElement(src, top, left) {
   gif.style.left = left;
   gif.style.maxWidth = "200px";
   gif.style.cursor = "move";
+  gif.style.zIndex = "4";
   makeDraggable(gif);
   return gif;
 }
@@ -284,6 +295,7 @@ function createLinkElement(linkUrl, top = "250px", left = "250px") {
   link.style.color = "blue";
   link.style.textDecoration = "underline";
   link.style.cursor = "move";
+  link.style.zIndex = "4";
 
   workspace.appendChild(link);
   undoStack.push({type: "element", element: link});
@@ -471,6 +483,9 @@ function makeDraggable(element) {
   let isDragging = false;
   let startX, startY, elementX, elementY;
   element.addEventListener("mousedown", (e) => {
+    if (element.contentEditable === "true" && document.activeElement === element) {
+      return;
+    }
     isDragging = true;
     startX = e.pageX;
     startY = e.pageY;
@@ -514,20 +529,20 @@ drawBtn.addEventListener("dblclick", (e) => {
   e.stopPropagation();
 });
 
-const applyThemeBtn = document.getElementById("apply-theme-btn");
+// const applyThemeBtn = document.getElementById("apply-theme-btn");
 
-applyThemeBtn.addEventListener("click", (e) => {
-  toolActive[currentTool] = {
-    color: document.getElementById("color-picker").value,
-    lineWidth: parseInt(document.getElementById("line-width").value, 10) || toolDefaults[currentTool].lineWidth
-  };
+// applyThemeBtn.addEventListener("click", (e) => {
+//   toolActive[currentTool] = {
+//     color: document.getElementById("color-picker").value,
+//     lineWidth: parseInt(document.getElementById("line-width").value, 10) || toolDefaults[currentTool].lineWidth
+//   };
   
-  activeSettings = { ...toolActive[currentTool], tool: currentTool };
+//   activeSettings = { ...toolActive[currentTool], tool: currentTool };
   
-  console.log("Theme applied for", currentTool, ":", activeSettings);
-  drawingOptionsDropdown.style.display = "none";
-  e.stopPropagation();
-});
+//   console.log("Theme applied for", currentTool, ":", activeSettings);
+//   drawingOptionsDropdown.style.display = "none";
+//   e.stopPropagation();
+// });
 
 const resetToolsBtn = document.getElementById("reset-tools-btn");
 
@@ -548,12 +563,12 @@ resetToolsBtn.addEventListener("click", (e) => {
 });
 
 addTextBtn.addEventListener("click", () => {
-  disableAllModes();
+  console.log("Text button clicked");
   addText();
 });
 
 addMediaBtn.addEventListener("click", () => {
-  disableAllModes();
+  console.log("Media button clicked");
   addMedia();
 });
 
