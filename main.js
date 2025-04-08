@@ -50,11 +50,13 @@ const setAutoLaunch = async (enabled) => {
 };
 
 async function createWindow() {
+  
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const panelWidth = Math.floor(width / 3) - 40;
   const currentSettings = await settings.get();
 
   mainWindow = new BrowserWindow({
+    
     width: 60,
     height,
     icon: ICON_PATH,
@@ -71,7 +73,7 @@ async function createWindow() {
   });
 
   mainWindow.loadFile("index.html");
-  // mainWindow.webContents.openDevTools({mode: 'detach'});
+  mainWindow.webContents.openDevTools({mode: 'detach'});
 
 
   mainWindow.webContents.on("did-finish-load", () => {

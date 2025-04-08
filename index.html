@@ -140,14 +140,16 @@
           <canvas id="drawing-canvas" data-type="drawing"></canvas>
         </div>
 
-        <!-- for adding Links -->
-        <div id="link-modal" class="modal">
-          <div class="modal-content">
-            <label for="link-input">Insert link here:</label>
-            <input type="text" id="link-input" placeholder="https://example.com" />
-            <button id="insert-link-btn" class="content-btn">Insert</button>
-          </div>
-        </div>
+<div id="link-modal" class="modal">
+  <div class="modal-content">
+    <label for="link-url-input">Link URL:</label>
+    <input type="text" id="link-input" placeholder="https://example.com" />
+    <label for="link-text-input">Link Text:</label>
+    <input type="text" id="link-text-input" placeholder="e.g., Example" />
+    <button id="insert-link-btn" class="content-btn">Insert and close</button>
+  </div>
+</div>
+
       </div>
     </div>
   </div>

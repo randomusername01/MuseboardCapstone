@@ -51,13 +51,31 @@ document.addEventListener("click", (event) => {
   }
 });
 
+const linkUrlInput = document.getElementById("link-input");
+const linkTextInput = document.getElementById("link-text-input");
+
 insertLinkBtn.addEventListener("click", () => {
-  const linkUrl = linkInput.value.trim();
-  if (linkUrl) {
-    createLinkElement(linkUrl);
+  const rawUrl = linkUrlInput.value.trim();
+  const linkText = linkTextInput.value.trim() || rawUrl;
+
+  if (!rawUrl) {
     linkModal.style.display = "none";
+    return;
   }
+
+  let finalUrl = rawUrl;
+  if (!/^https?:\/\//i.test(finalUrl)) {
+    finalUrl = "https://" + finalUrl;
+  }
+
+  createLinkElement(finalUrl, linkText, "250px", "250px");
+
+  linkModal.style.display = "none";
+  linkUrlInput.value = "";
+  linkTextInput.value = "";
 });
+
+
 
 let undoStack = [];
 let deleteEnabled = false;
@@ -282,12 +300,12 @@ addLinkBtn.addEventListener("click", () => {
   linkBeingEdited = null;
 });
 
-function createLinkElement(linkUrl, top = "250px", left = "250px") {
+function createLinkElement(linkUrl, linkText, top = "250px", left = "250px") {
   if (!linkUrl.trim()) return;
 
   const link = document.createElement("a");
   link.href = linkUrl;
-  link.innerText = linkUrl;
+  link.innerText = linkText;
   link.target = "_blank";
   link.style.position = "absolute";
   link.style.top = top;
@@ -298,9 +316,10 @@ function createLinkElement(linkUrl, top = "250px", left = "250px") {
   link.style.zIndex = "4";
 
   workspace.appendChild(link);
-  undoStack.push({type: "element", element: link});
+  undoStack.push({ type: "element", element: link });
   makeDraggable(link);
 }
+
 
 function disableDeleteMode() {
   if (!deleteEnabled) return;
