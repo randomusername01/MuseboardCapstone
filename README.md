@@ -1,6 +1,6 @@
 ## MuseBoard User Manual
 
-Welcome to MuseBoard, your digital whiteboard for brainstorming, note-taking, and visual collaboration. This manual will guide you through installing, launching, and using MuseBoard effectively.
+Welcome to MuseBoard, your digital whiteboard for brainstorming, note-taking, and personal expression. This manual will guide you through installing, launching, and using MuseBoard effectively.
 
 ---
 
