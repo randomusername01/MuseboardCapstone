@@ -81,6 +81,7 @@ let undoStack = [];
 let deleteEnabled = false;
 let currentStroke = null;
 let isDrawing = false;
+let drawings = [];
 
 const toolDefaults = {
   pen: { lineWidth: 3, color: "#000000" },
@@ -134,6 +135,20 @@ let drawingEnabled = false;
 const colorPicker = document.getElementById("color-picker");
 const lineWidth = document.getElementById("line-width");
 
+colorPicker.addEventListener("input", e => {
+  const c = e.target.value;
+  toolActive[currentTool].color   = c;
+  activeSettings.color            = c;
+  console.log(`Set ${currentTool} color →`, c);
+});
+
+lineWidth.addEventListener("input", e => {
+  const w = parseInt(e.target.value, 10) || toolDefaults[currentTool].lineWidth;
+  toolActive[currentTool].lineWidth = w;
+  activeSettings.lineWidth          = w;
+  console.log(`Set ${currentTool} width →`, w);
+});
+
 function enableDrawing() {
   disableDeleteMode();
 
@@ -162,8 +177,6 @@ function getMousePosition(canvas, event) {
     y: event.clientY - rect.top
   };
 }
-
-let drawings = [];
 
 function startDrawing(e) {
   isDrawing = true;
