@@ -1,14 +1,19 @@
 # **MuseBoard**
 
 ## **Table of Contents**
-- [About the Project](#about-the-project)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Getting Started](#getting-started)
-  - [For End Users](#for-end-users)
-  - [For Developers](#for-developers)
-- [Usage](#usage)
-- [Screenshots](#screenshots)
+- [**MuseBoard**](#museboard)
+  - [**Table of Contents**](#table-of-contents)
+  - [**About the Project**](#about-the-project)
+    - [**Why MuseBoard?**](#why-museboard)
+  - [**Features**](#features)
+  - [**Technologies Used**](#technologies-used)
+  - [**Getting Started**](#getting-started)
+    - [For End Users](#for-end-users)
+    - [For Developers](#for-developers)
+      - [Prerequisites](#prerequisites)
+      - [Development Setup](#development-setup)
+  - [**Usage**](#usage)
+  - [**Screenshots**](#screenshots)
 
 ---
 
@@ -57,7 +62,7 @@ Traditional note-taking apps often lack the flexibility to include visual elemen
    ```
 2. Navigate to the project directory:
    ```bash
-   cd Museboard
+   cd MuseboardCapstone
    ```
 3. Install dependencies:
    ```bash
