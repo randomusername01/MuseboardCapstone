@@ -39,9 +39,26 @@ drawingOptionsDropdown.addEventListener("click", (e) => {
   e.stopPropagation();
 });
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
     linkModal.style.display = "none";
+    tutorialModal.style.display = "none";
+    return;
+  }
+
+  if (e.key.toLowerCase() === "d") {
+    enableDrawing();
+    return;
+  }
+
+  if (e.key.toLowerCase() === "e") {
+    clearContent();
+    return;
+  }
+
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+    undoBtn.click();
+    return;
   }
 });
 
