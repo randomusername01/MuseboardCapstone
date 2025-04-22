@@ -1,4 +1,5 @@
 const { shell } = require("electron");
+const path = require("path");
 const workspace = document.getElementById("workspace");
 let canvas = document.getElementById("drawing-canvas");
 let ctx = canvas.getContext("2d");
@@ -502,6 +503,31 @@ workspace.addEventListener("click", (event) => {
     } else {
       console.log("No stroke found at clicked position.");
     }
+  }
+});
+workspace.addEventListener("dragover", e => e.preventDefault());
+workspace.addEventListener("drop", async e => {
+  e.preventDefault();
+  const dropX = e.offsetX, dropY = e.offsetY;
+
+  for (const file of e.dataTransfer.files) {
+    const ext  = path.extname(file.path || file.name).toLowerCase();
+    const mime = file.type || "";
+    const isGif = mime === "image/gif" || ext === ".gif";
+    const isImg = mime.startsWith("image/") && !isGif;
+    if (!isImg && !isGif) continue;
+
+    const src = file.path || await new Promise(r => {
+      const reader = new FileReader();
+      reader.onload = () => r(reader.result);
+      reader.readAsDataURL(file);
+    });
+
+    const element = isGif
+      ? createGifElement(src,  `${dropY}px`, `${dropX}px`)
+      : createImageElement(src, `${dropY}px`, `${dropX}px`);
+    workspace.appendChild(element);
+    undoStack.push({ type: "element", element });
   }
 });
 

@@ -236,18 +236,16 @@ loadSettings().then((settings) => {
 function togglePanel() {
   isPanelVisible = !isPanelVisible;
 
+  panel.classList.toggle("visible", isPanelVisible);
+
   const icon = toggleButton.querySelector("i");
-  if (isPanelVisible) {
-    panel.classList.add("visible");
-    icon.classList.replace("fa-square-caret-left", "fa-square-caret-right");
-  } else {
-    panel.classList.remove("visible");
-    icon.classList.replace("fa-square-caret-right", "fa-square-caret-left");
-  }
-
+  icon.classList.replace(
+    isPanelVisible ? "fa-square-caret-left" : "fa-square-caret-right",
+    isPanelVisible ? "fa-square-caret-right" : "fa-square-caret-left"
+  );
   ipcRenderer.send("toggle-panel", isPanelVisible);
+  resizeCanvas();
 }
-
 
 toggleButton.addEventListener("click", togglePanel);
 
