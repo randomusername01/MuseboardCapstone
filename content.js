@@ -46,17 +46,18 @@ document.addEventListener("keydown", (e) => {
     tutorialModal.style.display = "none";
     return;
   }
-  if (e.key.toLowerCase() === "t") {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "t") {
+    e.preventDefault();
     addText();
     return;
   }
-  
-  if (e.key.toLowerCase() === "d") {
+
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d") {
     enableDrawing();
     return;
   }
 
-  if (e.key.toLowerCase() === "e") {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
     clearContent();
     return;
   }
