@@ -1,6 +1,5 @@
 const { shell } = require("electron");
 const path = require("path");
-const path = require("path");
 const workspace = document.getElementById("workspace");
 let canvas = document.getElementById("drawing-canvas");
 let ctx = canvas.getContext("2d");
