@@ -60,7 +60,7 @@ const setAutoLaunch = async (enabled) => {
 async function createWindow() {
   
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const panelWidth = Math.floor(width / 3) - 40;
+  const panelWidth = getSavedWindowWidth(Math.floor(width / 3) - 40);
   const currentSettings = await settings.get();
 
   mainWindow = new BrowserWindow({
@@ -74,6 +74,7 @@ async function createWindow() {
     transparent: true,
     alwaysOnTop: true,
     resizable: true,
+    minWidth: 200,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -116,6 +117,12 @@ async function createWindow() {
     });
   });
 
+  mainWindow.on("resize", () => {
+    const [w] = mainWindow.getSize();
+    if (w > 100) saveWindowWidth(w - 60);
+  });
+  
+
 
   ipcMain.on("toggle-panel", (event, isVisible) => {
     mainWindow.setBounds({
@@ -125,6 +132,17 @@ async function createWindow() {
     });
   });
 }
+
+const WINDOW_SIZE_KEY = "panelWidth";
+
+function saveWindowWidth(width) {
+  settings.setSync(WINDOW_SIZE_KEY, width);
+}
+
+function getSavedWindowWidth(defaultWidth) {
+  return settings.getSync(WINDOW_SIZE_KEY, defaultWidth);
+}
+
 
 const setupIpcHandlers = () => {
   ipcMain.handle("get-settings", async () => await settings.get());

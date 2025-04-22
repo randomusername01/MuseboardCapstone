@@ -41,11 +41,16 @@ drawingOptionsDropdown.addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
+  // Ignore if the target is an input or editable field
+  if (e.target.tagName === "INPUT" || e.target.isContentEditable) return;
+
   if (e.key === "Escape") {
     linkModal.style.display = "none";
     tutorialModal.style.display = "none";
+    drawingOptionsDropdown.style.display = "none";
     return;
   }
+
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "t") {
     e.preventDefault();
     addText();
@@ -53,20 +58,25 @@ document.addEventListener("keydown", (e) => {
   }
 
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d") {
+    e.preventDefault();
     enableDrawing();
     return;
   }
 
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
+    e.preventDefault();
     clearContent();
     return;
   }
 
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+    e.preventDefault();
     undoBtn.click();
     return;
   }
 });
+
+
 
 document.addEventListener("click", (event) => {
   if (event.target === linkModal) {
@@ -76,6 +86,46 @@ document.addEventListener("click", (event) => {
 
 const linkUrlInput = document.getElementById("link-input");
 const linkTextInput = document.getElementById("link-text-input");
+
+workspace.addEventListener("dragover", e => e.preventDefault());
+
+workspace.addEventListener("drop", e => {
+  e.preventDefault();
+  const dropX = e.offsetX;
+  const dropY = e.offsetY;
+
+  for (const file of e.dataTransfer.files) {
+    const ext  = file.path ? path.extname(file.path).toLowerCase()
+                           : (file.name ? path.extname(file.name).toLowerCase() : "");
+    const mime = file.type || "";
+
+    const isGif  = mime === "image/gif"        || ext === ".gif";
+    const isImg  = mime.startsWith("image/")   && !isGif;
+    if (!isImg && !isGif) continue;
+
+    if (file.path) {
+      const element = isGif
+        ? createGifElement(file.path,  `${dropY}px`, `${dropX}px`)
+        : createImageElement(file.path, `${dropY}px`, `${dropX}px`);
+      workspace.appendChild(element);
+      undoStack.push({ type: "element", element });
+      continue;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataURL = reader.result;
+      const element = isGif
+        ? createGifElement(dataURL,  `${dropY}px`, `${dropX}px`)
+        : createImageElement(dataURL, `${dropY}px`, `${dropX}px`);
+      workspace.appendChild(element);
+      undoStack.push({ type: "element", element });
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+
 
 insertLinkBtn.addEventListener("click", () => {
   const rawUrl = linkUrlInput.value.trim();
