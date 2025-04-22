@@ -161,6 +161,7 @@ Open the **Customize Theme** panel to adjust default tool colors and thicknesses
 
 ## Keyboard Shortcuts
 - `Esc`: Close modals (link or tutorial).
+- `T`: Add a new textbox.
 - `Ctrl+Z` / `Cmd+Z`: Undo last action.
 - `D`: Toggle draw mode.
 - `E`: Toggle erase mode.

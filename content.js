@@ -46,7 +46,11 @@ document.addEventListener("keydown", (e) => {
     tutorialModal.style.display = "none";
     return;
   }
-
+  if (e.key.toLowerCase() === "t") {
+    addText();
+    return;
+  }
+  
   if (e.key.toLowerCase() === "d") {
     enableDrawing();
     return;
