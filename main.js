@@ -9,6 +9,14 @@ const fs = require('fs');
 const settings = require("electron-settings");
 const AutoLaunch = require("auto-launch");
 
+// const WINDOW_SIZE_KEY = "panelWidth";
+// function saveWindowWidth(width) {
+//   settings.setSync(WINDOW_SIZE_KEY, width);
+// }
+// function getSavedWindowWidth(defaultWidth) {
+//   return settings.getSync(WINDOW_SIZE_KEY, defaultWidth);
+// }
+
 const ICON_PATH = path.join(__dirname, "assets/icons/museboard-icon.png");
 const AUTO_LAUNCH_NAME = "MuseBoard";
 const DEFAULT_SETTINGS = {
@@ -65,12 +73,16 @@ async function createWindow() {
     frame: false,
     transparent: true,
     alwaysOnTop: true,
-    resizable: false,
+    resizable: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
+  // mainWindow.on("resize", () => {
+  //   const [w] = mainWindow.getSize();
+  //   if (w > 100) saveWindowWidth(w - 60);
+  // });
 
   mainWindow.loadFile("index.html");
   mainWindow.webContents.openDevTools({mode: 'detach'});
@@ -265,9 +277,8 @@ app.whenReady().then(async () => {
   Menu.setApplicationMenu(null);
   setDefaultSettings();
   setupIpcHandlers();
-  await createWindow(); // Wait until mainWindow is created
+  await createWindow();
 
-  // After the main window is created, adjust its bounds to open the panel automatically
   mainWindow.once("ready-to-show", () => {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const panelWidth = Math.floor(width / 3) - 40;
