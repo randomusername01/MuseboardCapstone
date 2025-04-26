@@ -241,4 +241,14 @@
   
   .tutorial-btn i {
     font-size: 1.4em;
-  }  
+  }
+  /* .panel {
+    overflow: visible; 
+    position: relative;
+  }
+  .toggle-button {
+    position: absolute;
+    left: 0;          
+    top: 10px;
+    z-index: 100;
+  }   */

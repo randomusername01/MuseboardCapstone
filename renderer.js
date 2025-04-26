@@ -77,6 +77,7 @@ async function grabWorkspaceAndCanvas() {
     html: workspaceHTML,
     metadata: workspaceMetadata,
     canvasState: canvasState,
+    drawings: drawings,
   };
 }
 
@@ -126,7 +127,7 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = boardData.html;
 
-  const newWorkspace = tempDiv.firstChild;
+  const newWorkspace = tempDiv.querySelector('#workspace');
 
   if (newWorkspace) {
     const elements = newWorkspace.children;
@@ -152,31 +153,38 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
     console.log(storedCanvas.canvasAttributes);
 
     if (storedCanvas) {
-      const contentArea = document.querySelector('#content-area');
-      if (contentArea) {
-        const existingCanvas = contentArea.querySelector('canvas');
-
+      const workspaceDiv = document.querySelector('#workspace');
+      if (workspaceDiv) {
+        const existingCanvas = workspaceDiv.querySelector('canvas');
+    
         const newCanvas = document.createElement('canvas');
         for (const [name, value] of Object.entries(storedCanvas.canvasAttributes)) {
           newCanvas.setAttribute(name, value);
         }
-
+    
         newCanvas.id = "drawing-canvas";
-
+    
         const ctx = newCanvas.getContext('2d');
         const img = new Image();
         img.src = boardData.canvasState.drawingData;
         img.onload = () => {
           ctx.drawImage(img, 0, 0);
         };
-
+    
         if (existingCanvas) {
-          contentArea.replaceChild(newCanvas, existingCanvas);
+          workspaceDiv.replaceChild(newCanvas, existingCanvas);
         } else {
-          contentArea.appendChild(newCanvas);
+          workspaceDiv.appendChild(newCanvas);
         }
 
         window.reinitCanvas();
+        if (boardData.drawings) {
+          drawings = boardData.drawings;
+          redrawCanvas();
+        } else {
+          drawings = [];
+        }
+        
       }
     } else {
       console.error("Parsed workspace is empty or invalid");
@@ -236,18 +244,17 @@ loadSettings().then((settings) => {
 function togglePanel() {
   isPanelVisible = !isPanelVisible;
 
+  panel.classList.toggle("visible", isPanelVisible);
+
   const icon = toggleButton.querySelector("i");
-  if (isPanelVisible) {
-    panel.classList.add("visible");
-    icon.classList.replace("fa-square-caret-left", "fa-square-caret-right");
-  } else {
-    panel.classList.remove("visible");
-    icon.classList.replace("fa-square-caret-right", "fa-square-caret-left");
-  }
+  icon.classList.replace(
+    isPanelVisible ? "fa-square-caret-left" : "fa-square-caret-right",
+    isPanelVisible ? "fa-square-caret-right" : "fa-square-caret-left"
+  );
 
   ipcRenderer.send("toggle-panel", isPanelVisible);
-}
 
+}
 
 toggleButton.addEventListener("click", togglePanel);
 
