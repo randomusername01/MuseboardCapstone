@@ -123,6 +123,7 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
   }
 
   clearContent();
+  disableAllModes();
 
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = boardData.html;
@@ -315,23 +316,27 @@ console.log("saveBtn is:", saveBtn);
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     console.log("Save clicked");
-
-    const userTitle = await customPrompt("Enter board title:") || "Untitled Board";
-    console.log("User title is:", userTitle);
-
+  
+    const userTitle = await customPrompt("Enter board title:");
+    if (!userTitle) {
+      console.log("Save cancelled at title step.");
+      return;
+    }
+  
     const tagString = await customPrompt("Enter tags (comma-separated):");
     let tags = [];
     if (tagString) {
       tags = tagString.split(",").map(t => t.trim());
     }
-
+  
     console.log("Tags array is:", tags);
-
+  
     let workspaceData = await grabWorkspaceAndCanvas();
     workspaceData.title = userTitle;
     workspaceData.tags = tags;
     saveBoard(workspaceData);
   });
+  
 }
 
 
