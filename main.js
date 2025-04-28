@@ -74,7 +74,6 @@ async function createWindow() {
     transparent: true,
     alwaysOnTop: true,
     resizable: true,
-    minWidth: 200,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -125,12 +124,14 @@ async function createWindow() {
 
 
   ipcMain.on("toggle-panel", (event, isVisible) => {
-    mainWindow.setBounds({
-      x: isVisible ? width - panelWidth - 60 : width - 60,
-      width: isVisible ? panelWidth + 60 : 60,
-      height,
-    });
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    const panelWidth = Math.floor(width / 3) - 40;   // your “600px” formula
+   mainWindow.setBounds({
+    x: isVisible ? width - panelWidth - 60 : width - 60,
+    width: isVisible ? panelWidth + 60 : 60,
+    height,
   });
+ });
 }
 
 const WINDOW_SIZE_KEY = "panelWidth";
