@@ -50,14 +50,18 @@
 .toolbar {
     display: flex;
     position: relative;
-    justify-content: space-around;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    padding: 5px;
+    padding: 5px 5px 5px 10px;
     background-color: var(--secondary-color);
     border-bottom: 1px solid #7f8c8d;
     z-index: 3;
 }
-
+.toolbar-left {
+    display: flex;
+    flex-direction: row;
+}
 /* Toolbar Buttons */
 .toolbar-btn {
     background: none;
