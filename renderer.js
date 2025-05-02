@@ -32,7 +32,6 @@ function convertImageToBase64(imagePath) {
   });
 }
 
-
 async function grabWorkspaceAndCanvas() {
   const images = document.querySelectorAll("#workspace img");
 
@@ -339,9 +338,6 @@ if (saveBtn) {
   
 }
 
-
-
-
 if (saveAsBtn) {
   saveAsBtn.addEventListener("click", () => {
     console.log("Save As clicked");
@@ -411,3 +407,8 @@ function customPrompt(message) {
     input.focus();
   });
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("resetSizeBtn")
+    .addEventListener("click", () => ipcRenderer.send("reset-window-size"));
+});

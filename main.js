@@ -9,13 +9,7 @@ const fs = require('fs');
 const settings = require("electron-settings");
 const AutoLaunch = require("auto-launch");
 
-// const WINDOW_SIZE_KEY = "panelWidth";
-// function saveWindowWidth(width) {
-//   settings.setSync(WINDOW_SIZE_KEY, width);
-// }
-// function getSavedWindowWidth(defaultWidth) {
-//   return settings.getSync(WINDOW_SIZE_KEY, defaultWidth);
-// }
+const settingsFile = path.join(app.getPath('userData'), 'window-settings.json');
 
 const ICON_PATH = path.join(__dirname, "assets/icons/museboard-icon.png");
 const AUTO_LAUNCH_NAME = "MuseBoard";
@@ -58,42 +52,96 @@ const setAutoLaunch = async (enabled) => {
 };
 
 async function createWindow() {
-  
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const panelWidth = getSavedWindowWidth(Math.floor(width / 3) - 40);
-  const currentSettings = await settings.get();
+  // Get full display size
+  const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().size;
 
+  // Default window size: 465px wide, full screen height
+  const defaultSize = { width: 465, height: screenHeight };
+
+  // Load saved size or fall back to default
+  let winSize = defaultSize;
+  
+  try {
+    const raw = fs.readFileSync(settingsFile, 'utf8');
+    winSize = JSON.parse(raw);
+    // never start off collapsed
+    if (winSize.width < 100) winSize.width = defaultSize.width;
+  } catch {
+    console.log("No settings file; using defaultSize", defaultSize);
+  }
+
+  // Retrieve persisted user settings
+  const currentSettings = await settings.get();
+  let expandedWidth = winSize.width;
+
+  // Create the main application window
   mainWindow = new BrowserWindow({
-    
-    width: 60,
-    height,
-    icon: ICON_PATH,
-    x: width - 60,
+    width: winSize.width,
+    height: winSize.height,
+    x: screenWidth - winSize.width,
     y: 0,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
     resizable: true,
+    icon: ICON_PATH,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
-  // mainWindow.on("resize", () => {
-  //   const [w] = mainWindow.getSize();
-  //   if (w > 100) saveWindowWidth(w - 60);
-  // });
 
-  mainWindow.loadFile("index.html");
-  mainWindow.webContents.openDevTools({mode: 'detach'});
+  // Load UI and open devtools
+  mainWindow.loadFile('index.html');
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
 
-
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow.webContents.send("apply-settings", currentSettings);
+  // Send stored settings to renderer once ready
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('apply-settings', currentSettings);
   });
 
-  ipcMain.on("open-theme-customizer", () => {
+  // Persist window size on every resize
+  mainWindow.on("resize", () => {
+    const [w, h] = mainWindow.getSize();
+    if (w < 100) return;          // skip collapse
+    expandedWidth = w;            // remember it
+    fs.writeFileSync(settingsFile, JSON.stringify({ width: w, height: h }));
+  });
 
+  // Persist on close (also updates expandedWidth)
+  mainWindow.on("close", () => {
+    const [w, h] = mainWindow.getSize();
+    if (w >= 100) {
+      expandedWidth = w;
+      fs.writeFileSync(settingsFile, JSON.stringify({ width: w, height: h }));
+    }
+  });
+
+  // Toggle panel visibility and save size
+  ipcMain.on("toggle-panel", (event, isVisible) => {
+    let w = isVisible
+      ? expandedWidth               // use last saved
+      : 60;                         // collapse
+    // ensure a sane minimum if settings.json was corrupt
+    if (isVisible && w < 100) w = defaultSize.width;
+
+    mainWindow.setBounds({
+      x: screenWidth - w,
+      width: w,
+      height: screenHeight,
+      y: 0,
+    });
+    // only save on open (optional—resize handler already covers it)
+    if (isVisible) {
+      fs.writeFileSync(
+        settingsFile,
+        JSON.stringify({ width: w, height: screenHeight })
+      );
+    }
+  });
+
+  // Open theme customizer modal
+  ipcMain.on('open-theme-customizer', () => {
     modalWindow = new BrowserWindow({
       parent: mainWindow,
       modal: true,
@@ -105,45 +153,10 @@ async function createWindow() {
         contextIsolation: false,
       },
     });
-
-    modalWindow.loadFile("theme-customizer.html");
-
-
-    ipcMain.once("close-window", () => {
-      if (modalWindow) {
-        modalWindow.close();
-      }
-    });
+    modalWindow.loadFile('theme-customizer.html');
+    ipcMain.once('close-window', () => modalWindow?.close());
   });
-
-  mainWindow.on("resize", () => {
-    const [w] = mainWindow.getSize();
-    if (w > 100) saveWindowWidth(w - 60);
-  });
-  
-
-
-  ipcMain.on("toggle-panel", (event, isVisible) => {
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const panelWidth = Math.floor(width / 3) - 40;   // your “600px” formula
-   mainWindow.setBounds({
-    x: isVisible ? width - panelWidth - 60 : width - 60,
-    width: isVisible ? panelWidth + 60 : 60,
-    height,
-  });
- });
 }
-
-const WINDOW_SIZE_KEY = "panelWidth";
-
-function saveWindowWidth(width) {
-  settings.setSync(WINDOW_SIZE_KEY, width);
-}
-
-function getSavedWindowWidth(defaultWidth) {
-  return settings.getSync(WINDOW_SIZE_KEY, defaultWidth);
-}
-
 
 const setupIpcHandlers = () => {
   ipcMain.handle("get-settings", async () => await settings.get());
@@ -289,6 +302,16 @@ const setupIpcHandlers = () => {
     }
   });
 
+  ipcMain.on("reset-window-size", () => {
+    const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().size;
+    const defaultSize = { width: 465, height: screenHeight };
+    mainWindow.setBounds({ x: screenWidth - defaultSize.width, ...defaultSize, y: 0 });
+    try {
+      fs.writeFileSync(settingsFile, JSON.stringify(defaultSize));
+    } catch (err) {
+      console.error("Failed to write reset size:", err);
+    }
+  });  
 
 };
 
@@ -298,15 +321,17 @@ app.whenReady().then(async () => {
   setupIpcHandlers();
   await createWindow();
 
-  mainWindow.once("ready-to-show", () => {
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const panelWidth = Math.floor(width / 3) - 40;
-    mainWindow.setBounds({
-      x: width - panelWidth - 60,
-      width: panelWidth + 60,
-      height,
-    });
-  });
+  // if (!fs.existsSync(settingsFile)) {
+  //    mainWindow.once("ready-to-show", () => {
+  //      const { width, height } = screen.getPrimaryDisplay().size;
+  //      const panelWidth = Math.floor(width / 3) - 40;
+  //      mainWindow.setBounds({
+  //       x: width - panelWidth - 60,
+  //       width: panelWidth + 60,
+  //       height,
+  //     });
+  //   });
+  // }
 });
 
 app.on("window-all-closed", () => {

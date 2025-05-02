@@ -3,6 +3,10 @@
     --secondary-color: #2C3E50;
 }
 
+body, .writable-area, #content-area, .panel-content {
+    -webkit-app-region: no-drag;
+  }
+
 body, html {
     margin: 0;
     padding: 0;
@@ -72,6 +76,7 @@ body, html {
 }
 
 .panel-header {
+    -webkit-app-region: drag;
     display: flex;
     text-align: center;
     padding: 5px 10px;
@@ -84,12 +89,17 @@ body, html {
     align-items: center;
 }
 
+.panel-header * {
+    -webkit-app-region: no-drag;
+  }
+
 .panel-header .title {
     flex: 1;
     text-align: left;
     padding-left: 10px;
     font-size: 2em;
     color: #ecf0f1;
+    user-select: none;
 }
 
 .panel-header .settings-btn {
