@@ -155,6 +155,7 @@ async function createWindow() {
     });
     modalWindow.loadFile('theme-customizer.html');
     ipcMain.once('close-window', () => modalWindow?.close());
+    mainWindow.webContents.send('hide-settings-dropdown');
   });
 }
 

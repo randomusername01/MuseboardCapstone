@@ -211,6 +211,10 @@ ipcRenderer.on(
   }
 );
 
+ipcRenderer.on('hide-settings-dropdown', () => {
+  settingsDropdown.style.display = "none";
+});
+
 async function loadSettings() {
   const settings = await ipcRenderer.invoke("get-settings");
   console.log("Loaded settings:", settings);
@@ -275,6 +279,7 @@ document.addEventListener("click", () => {
 document
   .querySelector('[data-action="customize-theme"]')
   .addEventListener("click", () => {
+    settingsDropdown.style.display = "none";
     ipcRenderer.send("open-theme-customizer");
   });
 
