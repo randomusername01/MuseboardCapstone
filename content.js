@@ -524,9 +524,15 @@ workspace.addEventListener("click", (event) => {
   }
   
   if (target.tagName === "IMG" || target.tagName === "A" || target.dataset.type === "text") {
-    console.log("Deleted element:", target);
+    const parent = workspace;
+    const next = target.nextSibling;
+    undoStack.push({
+      type: "delete-element",
+      element: target,
+      parent,
+      nextSibling: next
+    });
     target.remove();
-    undoStack = undoStack.filter(action => action.element !== target);
     return;
   }
   
@@ -557,12 +563,10 @@ workspace.addEventListener("click", (event) => {
       if (removedIndex !== -1) break;
     }
     if (removedIndex !== -1) {
-      console.log(`Deleted stroke at index: ${removedIndex}`);
-      drawings.splice(removedIndex, 1);
+      const [removedStroke] = drawings.splice(removedIndex, 1);
+      undoStack.push({ type: "delete-stroke", stroke: removedStroke, index: removedIndex });
       redrawCanvas();
-    } else {
-      console.log("No stroke found at clicked position.");
-    }
+    }    
   }
 });
 workspace.addEventListener("dragover", e => e.preventDefault());
@@ -718,20 +722,38 @@ clearBtn.addEventListener("click", () => {
   clearContent();
   console.log("Delete mode:", deleteEnabled);
 });
+
 undoBtn.addEventListener("click", () => {
-  const lastAction = undoStack.pop();
-  if (lastAction) {
-    if (lastAction.type === "drawing") {
-      const index = drawings.indexOf(lastAction.stroke);
-      if (index !== -1) {
-        drawings.splice(index, 1);
-      }
+  const last = undoStack.pop();
+  if (!last) return;
+
+  switch (last.type) {
+    case "drawing":
+      const idx = drawings.indexOf(last.stroke);
+      if (idx !== -1) drawings.splice(idx, 1);
       redrawCanvas();
-    } else if (lastAction.type === "element") {
-      lastAction.element.remove();
-    }
+      break;
+
+    case "element":
+      last.element.remove();
+      break;
+
+    case "delete-element":
+      if (last.nextSibling) {
+        last.parent.insertBefore(last.element, last.nextSibling);
+      } else {
+        last.parent.appendChild(last.element);
+      }
+      break;
+
+    case "delete-stroke":
+      drawings.splice(last.index, 0, last.stroke);
+      redrawCanvas();
+      break;
+
   }
 });
+
 const closeDrawingOptions = document.getElementById("close-drawing-options");
 closeDrawingOptions.addEventListener("click", (e) => {
   drawingOptionsDropdown.style.display = "none";
