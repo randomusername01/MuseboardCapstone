@@ -358,6 +358,8 @@ function addMedia(top = "150px", left = "150px") {
 function createImageElement(src, top, left) {
   const img = document.createElement("img");
   img.src = src;
+  img.draggable = false;
+  img.addEventListener("dragstart", e => e.preventDefault());
   img.style.position = "absolute";
   img.style.top = top;
   img.style.left = left;
@@ -373,6 +375,8 @@ function createImageElement(src, top, left) {
 function createGifElement(src, top, left) {
   const gif = document.createElement("img");
   gif.src = src;
+  gif.draggable = false;
+  gif.addEventListener("dragstart", e => e.preventDefault());
   gif.style.position = "absolute";
   gif.style.top = top;
   gif.style.left = left;
