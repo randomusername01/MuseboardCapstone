@@ -19,14 +19,19 @@ const drawingOptionsDropdown = document.getElementById("drawing-options-dropdown
 const tutorialButton = document.getElementById("tutorialButton");
 const tutorialModal = document.getElementById("tutorial-modal");
 const closeTutorialBtn = document.getElementById("close-tutorial-btn");
+const tutorialContent = document.getElementById("tutorial-content");
 
 tutorialButton.addEventListener("click", (e) => {
   tutorialModal.style.display = "block";
+
+  tutorialContent.scrollTo({top: 0, left: 0});
   e.stopPropagation();
 });
 
 closeTutorialBtn.addEventListener("click", (e) => {
   tutorialModal.style.display = "none";
+  tutorialContent.scrollTo({ top: 0, left: 0 });
+
   e.stopPropagation();
 });
 
