@@ -259,3 +259,24 @@
     top: 10px;
     z-index: 100;
   }   */
+
+.link-toolbar {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-family: Poppins, sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: flex;
+  gap: 8px;
+}
+.link-toolbar button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  color: #0077cc;
+}
+.link-toolbar button:hover { text-decoration: underline; }

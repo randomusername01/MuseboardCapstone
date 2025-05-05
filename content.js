@@ -426,6 +426,94 @@ function createGifElement(src, top, left) {
 
 let linkBeingEdited = null;
 
+let currentLink   = null;
+let linkToolbar   = null;
+let hideTimer     = null;
+
+function buildToolbar() {
+  linkToolbar = document.createElement("div");
+  linkToolbar.className = "link-toolbar";
+  linkToolbar.innerHTML = `
+    <button id="edit-link-btn">Edit</button>
+    <button id="delete-link-btn">Delete</button>
+  `;
+  document.body.appendChild(linkToolbar);
+
+  linkToolbar.querySelector("#edit-link-btn").addEventListener("click", () => {
+    if (!currentLink) return;
+    linkUrlInput.value  = currentLink.href;
+    linkTextInput.value = currentLink.innerText;
+    linkModal.style.display = "block";
+    linkBeingEdited = currentLink;
+    hideLinkToolbar(true);
+  });
+
+linkToolbar.querySelector("#delete-link-btn").addEventListener("click", () => {
+  if (!currentLink) return;
+
+  const textBox = document.createElement("div");
+  textBox.setAttribute("data-type", "text");
+  textBox.contentEditable = true;
+  textBox.innerText = currentLink.innerText;
+  textBox.style.position   = "absolute";
+  textBox.style.top        = currentLink.style.top;
+  textBox.style.left       = currentLink.style.left;
+  textBox.style.fontSize   = "1em";
+  textBox.style.cursor     = "move";
+  textBox.style.zIndex     = "4";
+
+  undoStack.push({
+    type: "delete-element",
+    element: currentLink,
+    parent: currentLink.parentNode,
+    nextSibling: currentLink.nextSibling
+  });
+
+  currentLink.parentNode.replaceChild(textBox, currentLink);
+  makeDraggable(textBox);
+  hideLinkToolbar(true);
+});
+
+  
+
+  linkToolbar.addEventListener("mouseenter", () => clearTimeout(hideTimer));
+  linkToolbar.addEventListener("mouseleave", startHideCountdown);
+}
+
+function positionToolbar(linkEl) {
+  const rect = linkEl.getBoundingClientRect();
+  linkToolbar.style.left   = `${rect.left}px`;
+  linkToolbar.style.top    = `${rect.bottom + 4}px`;
+}
+
+function showLinkToolbar(linkEl) {
+  clearTimeout(hideTimer);
+  currentLink = linkEl;
+  if (!linkToolbar) buildToolbar();
+  positionToolbar(linkEl);
+  linkToolbar.style.display = "flex";
+}
+
+function hideLinkToolbar(force = false) {
+  clearTimeout(hideTimer);
+  if (linkToolbar) linkToolbar.style.display = "none";
+  if (force) currentLink = null;
+}
+
+function startHideCountdown() {
+  hideTimer = setTimeout(() => hideLinkToolbar(true), 300);
+}
+
+workspace.addEventListener("mouseover", e => {
+  if (e.target.tagName === "A") showLinkToolbar(e.target);
+});
+workspace.addEventListener("mouseout", e => {
+  if (e.target.tagName === "A" && !linkToolbar?.contains(e.relatedTarget)) {
+    startHideCountdown();
+  }
+});
+
+
 addLinkBtn.addEventListener("click", () => {
   linkInput.value = "";
   linkModal.style.display = "block";
@@ -664,29 +752,58 @@ function clearContent() {
 }
 
 function makeDraggable(element) {
-  let isDragging = false;
-  let startX, startY, elementX, elementY;
-  element.addEventListener("mousedown", (e) => {
-    if (element.contentEditable === "true" && document.activeElement === element) {
-      return;
+  let isDown = false;
+  let startX = 0, startY = 0;
+  let elemX  = 0, elemY  = 0;
+  let moved  = false;
+
+  element.addEventListener("mousedown", e => {
+    if (element.contentEditable === "true" && document.activeElement === element) return;
+    if (e.button !== 0) return;
+
+    if (element.tagName === "A") {
+      e.preventDefault();
     }
-    isDragging = true;
-    startX = e.pageX;
-    startY = e.pageY;
-    elementX = parseInt(element.style.left || 0, 10);
-    elementY = parseInt(element.style.top || 0, 10);
+
+    isDown  = true;
+    startX  = e.pageX;
+    startY  = e.pageY;
+    elemX   = parseInt(element.style.left || 0, 10);
+    elemY   = parseInt(element.style.top  || 0, 10);
+    moved   = false;
   });
-  document.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-    const deltaX = e.pageX - startX;
-    const deltaY = e.pageY - startY;
-    element.style.left = `${elementX + deltaX}px`;
-    element.style.top = `${elementY + deltaY}px`;
+
+  document.addEventListener("mousemove", e => {
+    if (!isDown) return;
+    const dx = e.pageX - startX;
+    const dy = e.pageY - startY;
+
+    if (!moved && Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+    if (moved) {
+      element.style.left = `${elemX + dx}px`;
+      element.style.top  = `${elemY + dy}px`;
+    }
   });
-  document.addEventListener("mouseup", () => {
-    isDragging = false;
+
+  document.addEventListener("mouseup", e => {
+    if (!isDown) return;
+    isDown = false;
+
+    if (element.tagName === "A") {
+      e.preventDefault();
+
+      if (!moved) {
+        shell.openExternal(element.href);
+      }
+    }
   });
+
+  if (element.tagName === "A") {
+    element.addEventListener("click", e => e.preventDefault());
+  }
 }
+
+
 
 drawBtn.addEventListener("click", () => {
   if (drawingOptionsDropdown.style.display === "block") return;
