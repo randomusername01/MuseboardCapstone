@@ -925,3 +925,11 @@ function reinitCanvas() {
 }
 
 window.reinitCanvas = reinitCanvas;
+
+function updatePanelWidth() {
+  const panel = document.querySelector('.panel');
+  panel.style.width = `${window.innerWidth - 60}px`;
+}
+
+window.addEventListener('resize', updatePanelWidth);
+window.addEventListener('DOMContentLoaded', updatePanelWidth);
