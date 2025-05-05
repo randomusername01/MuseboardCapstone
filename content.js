@@ -862,8 +862,7 @@ addLinkBtn.addEventListener("click", () => {
 });
 clearBtn.addEventListener("click", () => {
   disableAllModes();
-  deleteEnabled = true;
-  clearBtn.classList.add('active');
+  toggleClear();
   console.log("Delete mode:", deleteEnabled);
 });
 
