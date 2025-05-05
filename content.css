@@ -37,7 +37,6 @@
   background-color: var(--primary-color); 
   color: white;
 }
-/* Workspace */
 #workspace {
     position: absolute;
     top: 50px; 
@@ -46,10 +45,10 @@
     height: 100%;
     z-index: 2;
     pointer-events: auto;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
-/* Toolbar Section */
 .toolbar {
     display: flex;
     position: relative;

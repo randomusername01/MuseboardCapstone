@@ -292,6 +292,8 @@ function toggleClear() {
 
 function getMousePosition(canvas, event) {
   const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width  / rect.width;
+  const scaleY = canvas.height / rect.height;
   return {
     x: event.clientX - rect.left,
     y: event.clientY - rect.top
@@ -374,6 +376,7 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
   textBox.style.fontSize = "1em";
   textBox.style.cursor = "move";
   textBox.style.zIndex = 4;
+  textBox.style.color = "#000000";
 
   canvas.appendChild(textBox);
   workspace.appendChild(textBox);
