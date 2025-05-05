@@ -146,8 +146,13 @@ insertLinkBtn.addEventListener("click", () => {
     finalUrl = "https://" + finalUrl;
   }
 
-  createLinkElement(finalUrl, linkText, "250px", "250px");
-
+  if (linkBeingEdited) {
+    linkBeingEdited.href      = finalUrl;
+    linkBeingEdited.innerText = linkText;
+    linkBeingEdited = null;
+  } else {
+    createLinkElement(finalUrl, linkText, "250px", "250px");
+  }
   linkModal.style.display = "none";
   linkUrlInput.value = "";
   linkTextInput.value = "";
@@ -450,27 +455,13 @@ function buildToolbar() {
 
 linkToolbar.querySelector("#delete-link-btn").addEventListener("click", () => {
   if (!currentLink) return;
-
-  const textBox = document.createElement("div");
-  textBox.setAttribute("data-type", "text");
-  textBox.contentEditable = true;
-  textBox.innerText = currentLink.innerText;
-  textBox.style.position   = "absolute";
-  textBox.style.top        = currentLink.style.top;
-  textBox.style.left       = currentLink.style.left;
-  textBox.style.fontSize   = "1em";
-  textBox.style.cursor     = "move";
-  textBox.style.zIndex     = "4";
-
   undoStack.push({
-    type: "delete-element",
-    element: currentLink,
-    parent: currentLink.parentNode,
-    nextSibling: currentLink.nextSibling
+  type: "delete-element",
+  element: currentLink,
+  parent: currentLink.parentNode,
+  nextSibling: currentLink.nextSibling
   });
-
-  currentLink.parentNode.replaceChild(textBox, currentLink);
-  makeDraggable(textBox);
+  currentLink.remove();
   hideLinkToolbar(true);
 });
 
