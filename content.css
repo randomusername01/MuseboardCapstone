@@ -28,12 +28,15 @@
 }
 
 .toolbar-btn.active {
-    background-color: #162935;
-    color: white;
-    border: 1px solid #03070a;
-  }
+  background-color: var(--primary-color);
+  color: white;
+  border: 1px solid #03070a;
+}
   
-
+.tool-option.selected {
+  background-color: var(--primary-color); 
+  color: white;
+}
 /* Workspace */
 #workspace {
     position: absolute;

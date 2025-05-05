@@ -64,13 +64,13 @@ document.addEventListener("keydown", (e) => {
 
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d") {
     e.preventDefault();
-    enableDrawing();
+    toggleDraw();
     return;
   }
 
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
     e.preventDefault();
-    clearContent();
+    toggleClear();
     return;
   }
 
@@ -228,8 +228,6 @@ lineWidth.addEventListener("input", e => {
 });
 
 function enableDrawing() {
-  disableDeleteMode();
-
   drawingEnabled = !drawingEnabled;
   drawBtn.classList.toggle("active", drawingEnabled);
   
@@ -247,6 +245,45 @@ function enableDrawing() {
     canvas.style.pointerEvents = "none";
   }
 }
+
+function toggleDraw() {
+  drawingEnabled = !drawingEnabled;
+
+  if (drawingEnabled) {
+    disableDeleteMode();
+    canvas.style.pointerEvents = "auto";
+    canvas.style.cursor = 'default';
+    console.log("Drawing mode enabled.");
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDrawing);
+  } else {
+    canvas.style.pointerEvents = "none";
+    canvas.style.cursor = 'default';
+    console.log("Drawing mode disabled.");
+    canvas.removeEventListener("mousedown", startDrawing);
+    canvas.removeEventListener("mousemove", draw);
+    canvas.removeEventListener("mouseup", stopDrawing);
+    canvas.style.pointerEvents = "none";
+  }
+
+  drawBtn.classList.toggle("active", drawingEnabled);
+}
+
+function toggleClear() {
+  deleteEnabled = !deleteEnabled;
+
+  if (deleteEnabled) {
+    disableDrawing();
+    canvas.style.cursor = 'crosshair';
+    console.log("Clear mode on");
+  } else {
+    canvas.style.cursor = 'default';
+    console.log("Clear mode off");
+  }
+  clearBtn.classList.toggle("active", deleteEnabled);
+}
+
 
 function getMousePosition(canvas, event) {
   const rect = canvas.getBoundingClientRect();
@@ -426,8 +463,12 @@ function disableDeleteMode() {
 }
 
 function disableAllModes() {
-  disableDrawing();
-  disableDeleteMode();
+  drawingEnabled = false;
+  deleteEnabled  = false;
+  document.querySelectorAll('.toolbar-btn').forEach(btn =>
+    btn.classList.remove('active')
+  );
+  canvas.style.cursor = "default";
 }
 
 function isPointNearLine(point, p1, p2, lineWidth) {
@@ -650,7 +691,7 @@ function makeDraggable(element) {
 drawBtn.addEventListener("click", () => {
   if (drawingOptionsDropdown.style.display === "block") return;
   disableAllModes();
-  enableDrawing();
+  toggleDraw();
 });
 
 drawBtn.addEventListener("dblclick", (e) => {
@@ -672,21 +713,6 @@ drawBtn.addEventListener("dblclick", (e) => {
   e.stopPropagation();
 });
 
-// const applyThemeBtn = document.getElementById("apply-theme-btn");
-
-// applyThemeBtn.addEventListener("click", (e) => {
-//   toolActive[currentTool] = {
-//     color: document.getElementById("color-picker").value,
-//     lineWidth: parseInt(document.getElementById("line-width").value, 10) || toolDefaults[currentTool].lineWidth
-//   };
-  
-//   activeSettings = { ...toolActive[currentTool], tool: currentTool };
-  
-//   console.log("Theme applied for", currentTool, ":", activeSettings);
-//   drawingOptionsDropdown.style.display = "none";
-//   e.stopPropagation();
-// });
-
 const resetToolsBtn = document.getElementById("reset-tools-btn");
 
 resetToolsBtn.addEventListener("click", (e) => {
@@ -706,24 +732,30 @@ resetToolsBtn.addEventListener("click", (e) => {
 });
 
 addTextBtn.addEventListener("click", () => {
+  disableAllModes();
   console.log("Text button clicked");
   addText();
+  addTextBtn.classList.add('active');
 });
 
 addMediaBtn.addEventListener("click", () => {
+  disableAllModes();
   console.log("Media button clicked");
   addMedia();
+  addMediaBtn.classList.add('active');
 });
 
 addLinkBtn.addEventListener("click", () => {
   disableAllModes();
   linkInput.value = "";
   linkModal.style.display = "block";
+  addLinkBtn.classList.add('active');
   linkBeingEdited = null;
 });
 clearBtn.addEventListener("click", () => {
-  disableDrawing();
-  clearContent();
+  disableAllModes();
+  deleteEnabled = true;
+  clearBtn.classList.add('active');
   console.log("Delete mode:", deleteEnabled);
 });
 
