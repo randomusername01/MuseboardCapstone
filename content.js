@@ -374,13 +374,20 @@ function addText(innerText = "Type your text here...", top = "100px", left = "10
   textBox.style.fontSize = "1em";
   textBox.style.cursor = "move";
   textBox.style.zIndex = 4;
+
+  canvas.appendChild(textBox);
   workspace.appendChild(textBox);
-  textBox.focus();
+  undoStack.push({ type: "element", element: textBox });
 
-  undoStack.push({type: "element", element: textBox});
   makeDraggable(textBox);
-}
 
+  textBox.focus();
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(textBox);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
 
 function addMedia(top = "150px", left = "150px") {
   ipcRenderer.invoke("select-file", "media").then((selectedFilePath) => {
