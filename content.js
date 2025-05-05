@@ -205,6 +205,7 @@ function resizeCanvas() {
 
 window.addEventListener("load", () => {
   resizeCanvas();
+  updatePanelWidth();
   workspace.style.display = "block";
   if (!isPanelVisible) {
     togglePanel();
@@ -935,4 +936,4 @@ function updatePanelWidth() {
 }
 
 window.addEventListener('resize', updatePanelWidth);
-window.addEventListener('DOMContentLoaded', updatePanelWidth);
+window.addEventListener("load", updatePanelWidth);
