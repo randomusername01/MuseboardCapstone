@@ -36,15 +36,6 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "randomusername01",           
-        "repo": "MuseBoardCapstone",
-        "draft": false,
-        "prerelease": false
-      }
-    ],
     "mac": {
       "target": "dmg",
       "icon": "builds/icons/museboard-icon.icns"
