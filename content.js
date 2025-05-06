@@ -202,14 +202,15 @@ function resizeCanvas() {
   canvas.height = rect.height;
   redrawCanvas();
 }
-
 window.addEventListener("load", () => {
   resizeCanvas();
-  updatePanelWidth();
+
   workspace.style.display = "block";
   if (!isPanelVisible) {
     togglePanel();
   }
+
+  updatePanelWidth();
 });
 
 window.addEventListener("resize", resizeCanvas);
@@ -936,4 +937,3 @@ function updatePanelWidth() {
 }
 
 window.addEventListener('resize', updatePanelWidth);
-window.addEventListener("load", updatePanelWidth);
