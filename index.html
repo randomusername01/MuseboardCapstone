@@ -15,16 +15,13 @@
     <button id="toggleButton" class="toggle-button">
       <i class="fa-solid fa-square-caret-left"></i>
     </button>
-
     <div class="panel-content">
       <header class="panel-header">
         <span class="title">MuseBoard</span>
         <button id="resetSizeBtn" class="settings-btn" title="Reset panel size">🔄</button>
-
         <button class="tutorial-btn" id="tutorialButton">
           <i class="fas fa-question"></i>
         </button>
-        <!-- Tutorial Modal -->
         <div id="tutorial-modal" class="modal">
           <div class="modal-content">
             <button id="close-tutorial-btn" class="close-modal">X</button>
@@ -32,39 +29,22 @@
             <div id="tutorial-content" style="overflow-y: auto; max-height: 400px;">
               <ul style="list-style: none; padding: 0; font-family: Poppins, sans-serif;">
                 <li style="margin-bottom: 20px;">
-                  <strong>Text:</strong>  
-                  Click the Text button to add an editable text box.  
-                  <i class="fas fa-font" style="margin-left: 8px;"></i>
+                  <strong>Text:</strong> Click the Text button to add an editable text box. <i class="fas fa-font" style="margin-left: 8px;"></i>
                 </li>
                 <li style="margin-bottom: 20px;">
-                  <strong>Media:</strong>  
-                  Click the Media button to insert images or GIFs from your computer.  
-                  <i class="fas fa-photo-video" style="margin-left: 8px;"></i>
+                  <strong>Media:</strong> Click the Media button to insert images or GIFs from your computer. <i class="fas fa-photo-video" style="margin-left: 8px;"></i>
                 </li>
                 <li style="margin-bottom: 20px;">
-                  <strong>Link:</strong>  
-                  Click the Link button to add a clickable URL; enter your address and optional display text.  
-                  <i class="fas fa-link" style="margin-left: 8px;"></i>
+                  <strong>Link:</strong> Click the Link button to add a clickable URL; enter your address and optional display text. <i class="fas fa-link" style="margin-left: 8px;"></i>
                 </li>
                 <li style="margin-bottom: 20px;">
-                  <strong>Draw:</strong>  
-                  Click the Draw button to start freehand drawing.  
-                  Double‑click it to open options—pick your tool (pen, pencil, highlighter, brush), color, and thickness.  
-                  <i class="fas fa-pencil-alt" style="margin-left: 8px;"></i>
+                  <strong>Draw:</strong> Click the Draw button to start freehand drawing. Double‑click it to open options—pick your tool (pen, pencil, highlighter, brush), color, and thickness. <i class="fas fa-pencil-alt" style="margin-left: 8px;"></i>
                 </li>
                 <li style="margin-bottom: 20px;">
-                  <strong>Erase & Undo:</strong>  
-                  Click the Clear (eraser) button to toggle erase mode and click any element or stroke to delete it.  
-                  Click the Undo button (or press <kbd>Ctrl+Z</kbd> / <kbd>⌘+Z</kbd>) to revert your last action.  
-                  <i class="fas fa-eraser" style="margin-left: 8px;"></i>
+                  <strong>Erase & Undo:</strong> Click the Clear (eraser) button to toggle erase mode and click any element or stroke to delete it. Click the Undo button (or press <kbd>Ctrl+Z</kbd> / <kbd>⌘+Z</kbd>) to revert your last action. <i class="fas fa-eraser" style="margin-left: 8px;"></i>
                 </li>
                 <li style="margin-bottom: 20px;">
-                  <strong>Settings & Themes:</strong>  
-                  Click the gear icon to open settings:  
-                  – <em>Open</em> / <em>Save</em> boards  
-                  – Toggle “Launch on Start” or “Dark Mode”  
-                  – Customize each tool’s default color & thickness  
-                  <i class="fas fa-cog" style="margin-left: 8px;"></i>
+                  <strong>Settings & Themes:</strong> Click the gear icon to open settings: – <em>Open</em> / <em>Save</em> boards – Toggle “Launch on Start” or “Dark Mode” – Customize each tool’s default color & thickness <i class="fas fa-cog" style="margin-left: 8px;"></i>
                   <div style="margin-top: 8px;">
                     <img src="assets/icons/screenshot0.png" alt="Settings dropdown" style="display:inline-block; width:30%; margin-right:4px;">
                     <img src="assets/icons/screenshot1.png" alt="Customize Theme" style="display:inline-block; width:30%; margin-right:4px;">
@@ -72,22 +52,15 @@
                   </div>
                 </li>
                 <li style="margin-bottom: 20px;">
-                  <strong>Keyboard Shortcuts:</strong>  
-                  <kbd>Esc</kbd> – close any open modal
-                  <kbd>Ctrl+T</kbd> – add a new text box  
-                  <kbd>Ctrl+D</kbd> – toggle Draw mode  
-                  <kbd>Ctrl+E</kbd> – toggle Erase mode  
-                  <kbd>Ctrl+Z</kbd> / <kbd>⌘+Z</kbd> – Undo  
+                  <strong>Keyboard Shortcuts:</strong> <kbd>Esc</kbd> – close any open modal <kbd>Ctrl+T</kbd> – add a new text box <kbd>Ctrl+D</kbd> – toggle Draw mode <kbd>Ctrl+E</kbd> – toggle Erase mode <kbd>Ctrl+Z</kbd> / <kbd>⌘+Z</kbd> – Undo
                 </li>
               </ul>
-              
             </div>
           </div>
         </div>
         <button class="settings-btn" id="settingsButton">
           <i class="fas fa-cog"></i>
         </button>
-        <!-- Dropdown Menu -->
         <div class="dropdown-menu" id="settingsDropdown">
           <div class="dropdown-item" id="openBtn">Open</div>
           <div class="dropdown-item" id="saveBtn">Save</div>
@@ -110,8 +83,6 @@
           <div class="dropdown-item" data-action="customize-theme">Customize Theme</div>
         </div>
       </header>
-
-      <!-- Content Area -->
       <div id="content-area">
         <div class="toolbar">
           <button class="toolbar-btn" id="add-text-btn">
@@ -133,10 +104,8 @@
           <div id="drawing-options-dropdown" style="display: none;">
             <label for="color-picker">Color:</label>
             <input type="color" id="color-picker" value="#34495e">
-            
             <label for="line-width">Thickness:</label>
             <input type="range" id="line-width" min="1" max="10" value="2">
-            
             <div id="drawing-tools">
               <button class="tool-option selected" data-tool="pen">Pen</button>
               <button class="tool-option" data-tool="pencil">Pencil</button>
@@ -154,31 +123,23 @@
             <i class="fas fa-undo"></i>
             <span>Undo</span>
           </button>
-
-          <!-- <input type="color" id="color-picker" value="#34495e">
-          <input type="range" id="line-width" min="1" max="10" value="2"> -->
         </div>
-
         <div id="workspace">
           <canvas id="drawing-canvas" data-type="drawing"></canvas>
         </div>
-
-<div id="link-modal" class="modal">
-  <div class="modal-content">
-    <label for="link-url-input">Link URL:</label>
-    <input type="text" id="link-input" placeholder="https://example.com" />
-    <label for="link-text-input">Link Text:</label>
-    <input type="text" id="link-text-input" placeholder="e.g., Example" />
-    <button id="insert-link-btn" class="content-btn">Insert and close</button>
-  </div>
-</div>
-
+        <div id="link-modal" class="modal">
+          <div class="modal-content">
+            <label for="link-url-input">Link URL:</label>
+            <input type="text" id="link-input" placeholder="https://example.com" />
+            <label for="link-text-input">Link Text:</label>
+            <input type="text" id="link-text-input" placeholder="e.g., Example" />
+            <button id="insert-link-btn" class="content-btn">Insert and close</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
   <script src="content.js" defer></script>
   <script src="renderer.js" defer></script>
 </body>
-
 </html>

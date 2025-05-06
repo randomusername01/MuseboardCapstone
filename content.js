@@ -46,7 +46,6 @@ drawingOptionsDropdown.addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
-  // Ignore if the target is an input or editable field
   if (e.target.tagName === "INPUT" || e.target.isContentEditable) return;
 
   if (e.key === "Escape") {
@@ -56,32 +55,49 @@ document.addEventListener("keydown", (e) => {
     return;
   }
 
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "t") {
-    e.preventDefault();
-    addText();
-    return;
-  }
+  const mod = e.ctrlKey || e.metaKey;
+  if (!mod) return;
 
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d") {
-    e.preventDefault();
-    toggleDraw();
-    return;
-  }
+  switch (e.key.toLowerCase()) {
+    case "t":
+      e.preventDefault();
+      disableAllModes();
+      addText();
+      break;
 
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
-    e.preventDefault();
-    toggleClear();
-    return;
-  }
+    case "m":
+      e.preventDefault();
+      disableAllModes();
+      addMedia();
+      break;
 
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
-    e.preventDefault();
-    undoBtn.click();
-    return;
+    case "k":
+      e.preventDefault();
+      disableAllModes();
+      linkInput.value = "";
+      linkModal.style.display = "block";
+      linkBeingEdited = null;
+      break;
+
+    case "z":
+      e.preventDefault();
+      disableAllModes();
+      undoBtn.click();
+      break;
+
+    case "d":
+      e.preventDefault();
+      disableAllModes();
+      toggleDraw();
+      break;
+
+    case "e":
+      e.preventDefault();
+      disableAllModes();
+      toggleClear();
+      break;
   }
 });
-
-
 
 document.addEventListener("click", (event) => {
   if (event.target === linkModal) {
@@ -706,30 +722,6 @@ workspace.addEventListener("click", (event) => {
   }
 });
 workspace.addEventListener("dragover", e => e.preventDefault());
-workspace.addEventListener("drop", async e => {
-  e.preventDefault();
-  const dropX = e.offsetX, dropY = e.offsetY;
-
-  for (const file of e.dataTransfer.files) {
-    const ext  = path.extname(file.path || file.name).toLowerCase();
-    const mime = file.type || "";
-    const isGif = mime === "image/gif" || ext === ".gif";
-    const isImg = mime.startsWith("image/") && !isGif;
-    if (!isImg && !isGif) continue;
-
-    const src = file.path || await new Promise(r => {
-      const reader = new FileReader();
-      reader.onload = () => r(reader.result);
-      reader.readAsDataURL(file);
-    });
-
-    const element = isGif
-      ? createGifElement(src,  `${dropY}px`, `${dropX}px`)
-      : createImageElement(src, `${dropY}px`, `${dropX}px`);
-    workspace.appendChild(element);
-    undoStack.push({ type: "element", element });
-  }
-});
 
 function disableDrawing() {
   if (drawingEnabled) {
@@ -810,8 +802,12 @@ function makeDraggable(element) {
 
 drawBtn.addEventListener("click", () => {
   if (drawingOptionsDropdown.style.display === "block") return;
-  disableAllModes();
-  toggleDraw();
+  if (drawingEnabled) {
+    toggleDraw();
+  } else {
+    disableAllModes();
+    toggleDraw();
+  }
 });
 
 drawBtn.addEventListener("dblclick", (e) => {
@@ -855,27 +851,27 @@ addTextBtn.addEventListener("click", () => {
   disableAllModes();
   console.log("Text button clicked");
   addText();
-  addTextBtn.classList.add('active');
 });
 
 addMediaBtn.addEventListener("click", () => {
   disableAllModes();
   console.log("Media button clicked");
   addMedia();
-  addMediaBtn.classList.add('active');
 });
 
 addLinkBtn.addEventListener("click", () => {
   disableAllModes();
   linkInput.value = "";
   linkModal.style.display = "block";
-  addLinkBtn.classList.add('active');
   linkBeingEdited = null;
 });
 clearBtn.addEventListener("click", () => {
-  disableAllModes();
-  toggleClear();
-  console.log("Delete mode:", deleteEnabled);
+  if (deleteEnabled) {
+    toggleClear();
+  } else {
+    disableAllModes();
+    toggleClear();
+  }
 });
 
 undoBtn.addEventListener("click", () => {

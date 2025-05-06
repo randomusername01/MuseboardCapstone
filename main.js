@@ -1,22 +1,13 @@
 const { app, BrowserWindow, ipcMain, screen, Menu, dialog } = require("electron");
-
-process.on("unhandledRejection", (error) => {
-  console.error("Unhandled Promise Rejection:", error);
-});
-
 const path = require("path");
 const fs = require('fs');
 const settings = require("electron-settings");
 const AutoLaunch = require("auto-launch");
 
 const settingsFile = path.join(app.getPath('userData'), 'window-settings.json');
-
 const ICON_PATH = path.join(__dirname, "assets/icons/museboard-icon.png");
 const AUTO_LAUNCH_NAME = "MuseBoard";
-const DEFAULT_SETTINGS = {
-  launchOnStart: false,
-  darkMode: false,
-};
+const DEFAULT_SETTINGS = { launchOnStart: false, darkMode: false };
 
 let mainWindow;
 let modalWindow;
@@ -43,38 +34,26 @@ const setAutoLaunch = async (enabled) => {
     }
     console.log(`AUTO LAUNCH ${enabled ? "ENABLED" : "DISABLED"}`);
   } catch (error) {
-    if (error.message.includes("Can’t get login item")) {
-      console.warn("Auto-launch error ignored: Login item does not exist.");
-    } else {
+    if (!error.message.includes("Can’t get login item")) {
       console.error("Failed to set auto-launch:", error);
     }
   }
 };
 
 async function createWindow() {
-  // Get full display size
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().size;
-
-  // Default window size: 465px wide, full screen height
   const defaultSize = { width: 465, height: screenHeight };
-
-  // Load saved size or fall back to default
   let winSize = defaultSize;
-  
+
   try {
     const raw = fs.readFileSync(settingsFile, 'utf8');
     winSize = JSON.parse(raw);
-    // never start off collapsed
     if (winSize.width < 100) winSize.width = defaultSize.width;
-  } catch {
-    console.log("No settings file; using defaultSize", defaultSize);
-  }
+  } catch {}
 
-  // Retrieve persisted user settings
   const currentSettings = await settings.get();
   let expandedWidth = winSize.width;
 
-  // Create the main application window
   mainWindow = new BrowserWindow({
     width: winSize.width,
     height: winSize.height,
@@ -85,30 +64,23 @@ async function createWindow() {
     alwaysOnTop: true,
     resizable: true,
     icon: ICON_PATH,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
+    webPreferences: { nodeIntegration: true, contextIsolation: false },
   });
 
-  // Load UI and open devtools
   mainWindow.loadFile('index.html');
   mainWindow.webContents.openDevTools({ mode: 'detach' });
 
-  // Send stored settings to renderer once ready
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('apply-settings', currentSettings);
   });
 
-  // Persist window size on every resize
   mainWindow.on("resize", () => {
     const [w, h] = mainWindow.getSize();
-    if (w < 100) return;          // skip collapse
-    expandedWidth = w;            // remember it
+    if (w < 100) return;
+    expandedWidth = w;
     fs.writeFileSync(settingsFile, JSON.stringify({ width: w, height: h }));
   });
 
-  // Persist on close (also updates expandedWidth)
   mainWindow.on("close", () => {
     const [w, h] = mainWindow.getSize();
     if (w >= 100) {
@@ -117,12 +89,8 @@ async function createWindow() {
     }
   });
 
-  // Toggle panel visibility and save size
   ipcMain.on("toggle-panel", (event, isVisible) => {
-    let w = isVisible
-      ? expandedWidth               // use last saved
-      : 60;                         // collapse
-    // ensure a sane minimum if settings.json was corrupt
+    let w = isVisible ? expandedWidth : 60;
     if (isVisible && w < 100) w = defaultSize.width;
 
     mainWindow.setBounds({
@@ -131,7 +99,7 @@ async function createWindow() {
       height: screenHeight,
       y: 0,
     });
-    // only save on open (optional—resize handler already covers it)
+
     if (isVisible) {
       fs.writeFileSync(
         settingsFile,
@@ -140,7 +108,6 @@ async function createWindow() {
     }
   });
 
-  // Open theme customizer modal
   ipcMain.on('open-theme-customizer', () => {
     modalWindow = new BrowserWindow({
       parent: mainWindow,
@@ -148,10 +115,7 @@ async function createWindow() {
       width: 400,
       height: 300,
       resizable: false,
-      webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-      },
+      webPreferences: { nodeIntegration: true, contextIsolation: false },
     });
     modalWindow.loadFile('theme-customizer.html');
     ipcMain.once('close-window', () => modalWindow?.close());
@@ -165,9 +129,7 @@ const setupIpcHandlers = () => {
     await settings.set(key, value);
     console.log(`Saved setting ${key} with value ${value}`);
   });
-  ipcMain.on("toggle-launch-on-startup", (e, isEnabled) =>
-    setAutoLaunch(isEnabled)
-  );
+  ipcMain.on("toggle-launch-on-startup", (e, isEnabled) => setAutoLaunch(isEnabled));
   ipcMain.on("update-theme-colors", (e, newPrimaryColor, newSecondaryColor) => {
     if (mainWindow) {
       mainWindow.webContents.send(
@@ -191,7 +153,6 @@ const setupIpcHandlers = () => {
       const filePath = result.filePaths[0];
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       const boardData = JSON.parse(fileContent);
-
 
       e.sender.send('load-board-data', boardData);
       return { success: true };
@@ -232,9 +193,7 @@ const setupIpcHandlers = () => {
       }
 
       entry.title = data.title || path.basename(filePath);
-
       entry.tags = data.tags || [];
-
       const thumb = data.canvasState?.thumbnailBase64 || null;
       entry.thumbnailBase64 = thumb;
 
@@ -272,8 +231,6 @@ const setupIpcHandlers = () => {
     }
   });
 
-
-
   let boardsMetadata = [];
 
   ipcMain.handle('get-all-boards-metadata', async () => {
@@ -297,7 +254,6 @@ const setupIpcHandlers = () => {
       mainWindow.webContents.send('load-board-data', boardData);
 
       if (modalWindow) modalWindow.close();
-
     } catch (err) {
       console.error('Error opening specific board:', err);
     }
@@ -312,8 +268,7 @@ const setupIpcHandlers = () => {
     } catch (err) {
       console.error("Failed to write reset size:", err);
     }
-  });  
-
+  });
 };
 
 app.whenReady().then(async () => {
@@ -321,18 +276,6 @@ app.whenReady().then(async () => {
   setDefaultSettings();
   setupIpcHandlers();
   await createWindow();
-
-  // if (!fs.existsSync(settingsFile)) {
-  //    mainWindow.once("ready-to-show", () => {
-  //      const { width, height } = screen.getPrimaryDisplay().size;
-  //      const panelWidth = Math.floor(width / 3) - 40;
-  //      mainWindow.setBounds({
-  //       x: width - panelWidth - 60,
-  //       width: panelWidth + 60,
-  //       height,
-  //     });
-  //   });
-  // }
 });
 
 app.on("window-all-closed", () => {
@@ -375,10 +318,7 @@ function openCustomFileBrowser() {
     width: 600,
     height: 500,
     resizable: true,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
+    webPreferences: { nodeIntegration: true, contextIsolation: false }
   });
 
   modalWindow.loadFile('custom-file-browser.html');

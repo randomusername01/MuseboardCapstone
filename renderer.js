@@ -2,7 +2,6 @@ const { ipcRenderer } = require("electron");
 
 function convertImageToBase64(imagePath) {
   return new Promise((resolve, reject) => {
-    // Check if the image is a GIF
     if (imagePath.toLowerCase().endsWith('.gif')) {
       fetch(imagePath)
         .then(response => response.blob())
@@ -34,7 +33,6 @@ function convertImageToBase64(imagePath) {
 
 async function grabWorkspaceAndCanvas() {
   const images = document.querySelectorAll("#workspace img");
-
   for (const img of images) {
     const src = img.src;
     if (src.startsWith("file://")) {
@@ -42,36 +40,28 @@ async function grabWorkspaceAndCanvas() {
       img.src = base64Src;
     }
   }
-
   const canvas = document.querySelector("canvas");
   let canvasState = null;
-
   if (canvas) {
     const drawingData = canvas.toDataURL("image/png");
-
     const canvasAttributes = {};
     for (const attr of canvas.attributes) {
       canvasAttributes[attr.name] = attr.value;
     }
-
     const thumbnailBase64 = generateThumbnail(canvas);
-
     canvasState = {
       drawingData,
       canvasAttributes,
       thumbnailBase64,
     };
   }
-
   const workspaceHTML = workspace.outerHTML;
-
   const workspaceMetadata = {
     width: workspace.offsetWidth,
     height: workspace.offsetHeight,
     top: workspace.style.top || "0px",
     left: workspace.style.left || "0px",
   };
-
   return {
     html: workspaceHTML,
     metadata: workspaceMetadata,
@@ -82,17 +72,13 @@ async function grabWorkspaceAndCanvas() {
 
 function generateThumbnail(canvas) {
   const THUMB_WIDTH = 200;
-
   if (canvas.width === 0 || canvas.height === 0) return null;
-
   const thumbCanvas = document.createElement("canvas");
   const scale = THUMB_WIDTH / canvas.width;
   thumbCanvas.width = THUMB_WIDTH;
   thumbCanvas.height = canvas.height * scale;
-
   const tctx = thumbCanvas.getContext("2d");
   tctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
-
   return thumbCanvas.toDataURL("image/png");
 }
 
@@ -111,7 +97,6 @@ function applySettings(settings) {
   } else {
     document.documentElement.classList.remove("dark-mode");
   }
-
   ipcRenderer.send("toggle-launch-on-startup", settings.launchOnStart);
 }
 
@@ -120,63 +105,46 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
     console.error("boardData or its 'html' attribute is undefined");
     return;
   }
-
   clearContent();
   disableAllModes();
-
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = boardData.html;
-
   const newWorkspace = tempDiv.querySelector('#workspace');
-
   if (newWorkspace) {
     const elements = newWorkspace.children;
     Array.from(elements).forEach((element) => {
-      console.log(element);
-
       if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'text') {
         addText(element.innerText, element.style.top, element.style.left);
-      }
-      else if (element.tagName.toLowerCase() === 'img' && /^data:image\/png;base64,/.test(element.getAttribute('src'))) {
+      } else if (element.tagName.toLowerCase() === 'img' && /^data:image\/png;base64,/.test(element.getAttribute('src'))) {
         addImage(element.getAttribute('src'), element.style.top, element.style.left);
-      }
-      else if (element.tagName.toLowerCase() === 'img' && /^data:image\/gif;base64,/.test(element.getAttribute('src'))) {
+      } else if (element.tagName.toLowerCase() === 'img' && /^data:image\/gif;base64,/.test(element.getAttribute('src'))) {
         addGif(element.getAttribute('src'), element.style.top, element.style.left);
-      }
-      else if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'link') {
+      } else if (element.tagName.toLowerCase() === 'div' && element.getAttribute('data-type') === 'link') {
         const anchor = element.querySelector('a');
         createLinkElement(anchor.href, element.style.top, element.style.left);
       }
     });
-
     const storedCanvas = boardData.canvasState;
-    console.log(storedCanvas.canvasAttributes);
-
     if (storedCanvas) {
       const workspaceDiv = document.querySelector('#workspace');
       if (workspaceDiv) {
         const existingCanvas = workspaceDiv.querySelector('canvas');
-    
         const newCanvas = document.createElement('canvas');
         for (const [name, value] of Object.entries(storedCanvas.canvasAttributes)) {
           newCanvas.setAttribute(name, value);
         }
-    
         newCanvas.id = "drawing-canvas";
-    
         const ctx = newCanvas.getContext('2d');
         const img = new Image();
         img.src = boardData.canvasState.drawingData;
         img.onload = () => {
           ctx.drawImage(img, 0, 0);
         };
-    
         if (existingCanvas) {
           workspaceDiv.replaceChild(newCanvas, existingCanvas);
         } else {
           workspaceDiv.appendChild(newCanvas);
         }
-
         window.reinitCanvas();
         if (boardData.drawings) {
           drawings = boardData.drawings;
@@ -184,7 +152,6 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
         } else {
           drawings = [];
         }
-        
       }
     } else {
       console.error("Parsed workspace is empty or invalid");
@@ -192,24 +159,14 @@ ipcRenderer.on('load-board-data', (e, boardData) => {
   }
 });
 
-
 ipcRenderer.on("apply-settings", (e, settings) => {
   applySettings(settings);
 });
 
-ipcRenderer.on(
-  "update-theme-colors",
-  (e, newPrimaryColor, newSecondaryColor) => {
-    document.documentElement.style.setProperty(
-      "--primary-color",
-      newPrimaryColor
-    );
-    document.documentElement.style.setProperty(
-      "--secondary-color",
-      newSecondaryColor
-    );
-  }
-);
+ipcRenderer.on("update-theme-colors", (e, newPrimaryColor, newSecondaryColor) => {
+  document.documentElement.style.setProperty("--primary-color", newPrimaryColor);
+  document.documentElement.style.setProperty("--secondary-color", newSecondaryColor);
+});
 
 ipcRenderer.on('hide-settings-dropdown', () => {
   settingsDropdown.style.display = "none";
@@ -217,13 +174,11 @@ ipcRenderer.on('hide-settings-dropdown', () => {
 
 async function loadSettings() {
   const settings = await ipcRenderer.invoke("get-settings");
-  console.log("Loaded settings:", settings);
   return settings;
 }
 
 async function saveSetting(key, value) {
   await ipcRenderer.invoke("save-setting", key, value);
-
   const settings = await ipcRenderer.invoke("get-settings");
   applySettings(settings);
 }
@@ -235,7 +190,6 @@ const settingsDropdown = document.getElementById("settingsDropdown");
 const toggleLaunchStart = document.getElementById("toggleLaunchStart");
 const toggleDarkMode = document.getElementById("toggleDarkMode");
 const toggleAutoSave = document.getElementById("toggleAutoSave");
-
 let isPanelVisible = false;
 
 loadSettings().then((settings) => {
@@ -247,17 +201,13 @@ loadSettings().then((settings) => {
 
 function togglePanel() {
   isPanelVisible = !isPanelVisible;
-
   panel.classList.toggle("visible", isPanelVisible);
-
   const icon = toggleButton.querySelector("i");
   icon.classList.replace(
     isPanelVisible ? "fa-square-caret-left" : "fa-square-caret-right",
     isPanelVisible ? "fa-square-caret-right" : "fa-square-caret-left"
   );
-
   ipcRenderer.send("toggle-panel", isPanelVisible);
-
 }
 
 toggleButton.addEventListener("click", togglePanel);
@@ -276,12 +226,10 @@ document.addEventListener("click", () => {
   settingsDropdown.style.display = "none";
 });
 
-document
-  .querySelector('[data-action="customize-theme"]')
-  .addEventListener("click", () => {
-    settingsDropdown.style.display = "none";
-    ipcRenderer.send("open-theme-customizer");
-  });
+document.querySelector('[data-action="customize-theme"]').addEventListener("click", () => {
+  settingsDropdown.style.display = "none";
+  ipcRenderer.send("open-theme-customizer");
+});
 
 toggleLaunchStart.addEventListener("change", (e) => {
   saveSetting("launchOnStart", e.target.checked);
@@ -290,13 +238,9 @@ toggleLaunchStart.addEventListener("change", (e) => {
 window.addEventListener("load", () => {
   const primaryColor = localStorage.getItem("primaryColor");
   const secondaryColor = localStorage.getItem("secondaryColor");
-
   if (primaryColor && secondaryColor) {
     document.documentElement.style.setProperty("--primary-color", primaryColor);
-    document.documentElement.style.setProperty(
-      "--secondary-color",
-      secondaryColor
-    );
+    document.documentElement.style.setProperty("--secondary-color", secondaryColor);
   }
 });
 
@@ -315,37 +259,25 @@ if (openBtn) {
 }
 
 const saveBtn = document.getElementById("saveBtn");
-console.log("saveBtn is:", saveBtn);
 
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
-    console.log("Save clicked");
-  
     const userTitle = await customPrompt("Enter board title:");
-    if (!userTitle) {
-      console.log("Save cancelled at title step.");
-      return;
-    }
-  
+    if (!userTitle) return;
     const tagString = await customPrompt("Enter tags (comma-separated):");
     let tags = [];
     if (tagString) {
       tags = tagString.split(",").map(t => t.trim());
     }
-  
-    console.log("Tags array is:", tags);
-  
     let workspaceData = await grabWorkspaceAndCanvas();
     workspaceData.title = userTitle;
     workspaceData.tags = tags;
     saveBoard(workspaceData);
   });
-  
 }
 
 if (saveAsBtn) {
   saveAsBtn.addEventListener("click", () => {
-    console.log("Save As clicked");
     settingsDropdown.style.display = "none";
   });
 }
