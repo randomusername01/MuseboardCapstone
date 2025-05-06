@@ -8,7 +8,7 @@
   "author": "benmolloy",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "dist": "electron-builder"
   },
   "dependencies": {
     "auto-launch": "6.0.0-rc1",
@@ -24,7 +24,10 @@
   },
   "build": {
     "win": {
-      "target": "nsis",
+      "target": [
+      "nsis",
+      "portable"
+      ],
       "icon": "builds/icons/museboard-icon.ico"
     },
     "nsis": {
@@ -33,6 +36,15 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "randomusername01",           
+        "repo": "MuseBoardCapstone",
+        "draft": false,
+        "prerelease": false
+      }
+    ],
     "mac": {
       "target": "dmg",
       "icon": "builds/icons/museboard-icon.icns"

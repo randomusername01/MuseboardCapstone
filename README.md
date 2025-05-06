@@ -19,8 +19,11 @@ Welcome to MuseBoard, your digital whiteboard for brainstorming, note-taking, an
 - [Workspace Overview](#workspace-overview)
   - [Panel \& Pop-out Toggle](#panel--pop-out-toggle)
   - [Canvas Area](#canvas-area)
+  - [Window Resizing](#window-resizing)
   - [Toolbar](#toolbar)
   - [Settings Menu](#settings-menu)
+  - [Resize Panel Button](#resize-panel-button)
+  - [Tutorial Button](#tutorial-button)
 - [Toolbar Functions](#toolbar-functions)
   - [Add Text](#add-text)
   - [Add Media (Image/GIF)](#add-media-imagegif)
@@ -96,11 +99,21 @@ By default, MuseBoard runs as a hidden sidebar. Click the arrow icon on the side
 ### Canvas Area
 - **Workspace**: The main whiteboard where you place and edit content.
 
+### Window Resizing
+- **Drag Edges**: Hover over any edge or corner of the window until the resize cursor appears, then click and drag to change the overall window size.  
+- **Maximize/Restore**: Use the system window controls (maximize/restore button) in the title bar to switch between full-screen width or previous dimensions.
+
 ### Toolbar
 Located at the top of the panel, provides quick access to all creation tools.
 
 ### Settings Menu
 Click the gear icon to access options like **Open**, **Save**, **Launch on Start**, **Dark Mode**, and **Customize Theme**.
+
+### Resize Panel Button
+- **Resize Handle**: At the top of the panel, the vertical bar icon lets you adjust the width of the sidebar. Click and drag left or right to increase or decrease the panel width.
+
+### Tutorial Button
+- **Help Icon**: Click the question-mark icon in the toolbar to open the built-in tutorial modal, which walks you through each tool and canvas feature. Close it by clicking the Escape key or the X button.
 
 ## Toolbar Functions
 
@@ -118,6 +131,7 @@ Click the gear icon to access options like **Open**, **Save**, **Launch on Start
 1. Click the **Link** icon.
 2. Enter the URL and optional display text.
 3. The link appears on the canvas and opens in your browser when clicked.
+4. Hovering over the link allows for editing and deleting the link.
 
 ### Draw Mode
 Click the **Draw** icon to enter freehand drawing mode. Double-click to open drawing options.
@@ -162,9 +176,12 @@ Open the **Customize Theme** panel to adjust default tool colors and thicknesses
 ## Keyboard Shortcuts
 - `Esc`: Close modals (link or tutorial).
 - `Ctrl+T`: Add a new textbox.
-- `Ctrl+Z` / `Cmd+Z`: Undo last action.
+- `Ctrl+M`: Add media.
+- `Ctrl+L`: Add new link.
 - `Ctrl+D`: Toggle draw mode.
 - `Ctrl+E`: Toggle erase mode.
+- `Ctrl+Z` / `Cmd+Z`: Undo last action.
+
 
 ## Tips & Best Practices
 - Use layers of text and media to keep content organized.
