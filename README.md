@@ -50,7 +50,7 @@ Welcome to MuseBoard, your digital whiteboard for brainstorming, note-taking, an
 MuseBoard is an Electron-based digital whiteboard designed to combine flexibility and ease of use. Whether you're sketching ideas, annotating visuals, or drafting quick notes, MuseBoard keeps your creativity flowing.
 
 ## Installation
-1. Visit the [Releases page](https://github.com/yourrepo/MuseBoard/releases) on GitHub.
+1. Visit the [Releases page](https://github.com/randomusername01/MuseboardCapstone/releases) on GitHub.
 2. **Download the Windows installer** (`.exe`). This is the only installer available at the moment.
 3. Run the downloaded `.exe` and follow the on-screen prompts.
 4. **macOS installer coming soon!** We’re actively working on a `.dmg` package for Mac users.
